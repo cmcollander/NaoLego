@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-# TODO: Write functions addBlock, sendBlockList, sendInitScreen, sendFinScreen, waitForNoMotion, verifyBlocks
+# TODO: Write functions sendBlockList, sendInitScreen, sendFinScreen, waitForNoMotion, verifyBlocks
 # TODO: Have the Nao relay the webserver information to the user to ensure they have the display
 # TODO: Obtain data such as time to add block, number of incorrect blocks, and individual error counters for wrong coordinates, wrong color, wrong size, etc.
 # TODO: A the end of the program, save the obtained data to a CSV file for future processing.
@@ -22,8 +22,39 @@ blockList = [] # Reperesents a list of LegoBlocks. Is initialized as empty
 # one lego peg to the layer beneath it.
 # If the new block's x coord is less than 0, shift all blocks to the right until the block's x coord is 0.
 # The first layer is y coord 0, second is y coord 1, etc. Keep in mind that a 'standard' block is a height of 2 layers
+# Decides a new lego block to add to the blockList. Randomly determined, no parameters or returns. Modifies blockList
+# Places a new block at a new layer on top of all previous blocks. Ensure the block does connect through at least
+# one lego peg to the layer beneath it.
+# If the new block's x coord is less than 0, shift all blocks to the right until the block's x coord is 0.
+# Also be prepared to shift to the left if need be. Shouldn't happen, but is included in the functionality
+# The first layer is y coord 0, second is y coord 1, etc. Keep in mind that a 'standard' block is a height of 2 layers
 def addBlock():
-	pass
+	# Find the current layer
+	layer = 0
+	for block in blockList:
+		layer += block.getHeight() # Increase Layer by the height of the block
+	height = random.choice([1,2]) # The height can be either 1 or 2
+	width = random.randrange(1,5) # The width can be between 1 and 4
+
+	if layer==0:
+		x = 0 # Our first block is placed at the origin
+		y = 0 # Our first block is placed at the origin
+	else: # If this is not our first block...
+		below = blockList[-1] # Obtain the block on the below layer, which should be the last placed in the list
+		left = below.x-(width-1) # Obtain our leftmost possible location
+		right = below.width+below.x - 1 # Obtain our rightmost possible location
+		x = random.randrange(left,right+1) # The X coordinate is determined from Left and Right
+		y = layer # The Y coordinate is the current layer
+	color = random.choice(["BLUE","RED","GREEN","YELLOW"]) # Find our color from these selections
+	newBlock = LegoBlock(width,height,color,x,y) # Create our new block from the generated information
+	blockList.append(newBlock) # Place our new block into our blockList
+	# Shift all blocks to the right so they are all nonnegative coordinates
+	v = []
+	for block in blockList:
+		v.append(block.x)
+	offset = -1*min(v) # Determine the offset by the negative of the most leftmost x coordinate
+	for block in blockList:
+		block.x = block.x + offset
 
 # TODO: Write this function
 # Creates an image of the blockList and sends it out to a web server
