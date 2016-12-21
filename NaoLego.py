@@ -16,7 +16,6 @@ tts = ALProxy("ALTextToSpeech",IP,9559) # Handles speech from the Nao
 
 blockList = [] # Reperesents a list of LegoBlocks. Is initialized as empty
 
-# TODO: Write this function 
 # Decides a new lego block to add to the blockList. Randomly determined, no parameters or returns. Modifies blockList
 # Places a new block at a new layer on top of all previous blocks. Ensure the block does connect through at least
 # one lego peg to the layer beneath it.
