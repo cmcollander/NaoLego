@@ -3,18 +3,26 @@
 # TODO: Write functions sendBlockList, sendInitScreen, sendFinScreen, waitForNoMotion, verifyBlocks
 # TODO: Have the Nao relay the webserver information to the user to ensure they have the display
 # TODO: Obtain data such as time to add block, number of incorrect blocks, and individual error counters for wrong coordinates, wrong color, wrong size, etc.
-# TODO: A the end of the program, save the obtained data to a CSV file for future processing.
-# TODO: Start an external webserver on the Nao that will load index.html through one of the Nao's ports.
+# TODO: At the end of the program, save the obtained data to a CSV file for future processing.
 # TODO: Create a starting dialog for Nao to tell the user how the assembly program works
 
 from LegoBlock import LegoBlock
 from naoqi import ALProxy
+import SimpleHTTPServer
+import SocketServer
 
+SERVERPORT = 8080 # What port number with the hosted webserver be run on?
 NUMBLOCKS = 5 # Represents the number of blocks we will assemble
 IP = "127.0.0.1" # IP Address of the Nao. Since this is run from the Nao, this is localhost
 tts = ALProxy("ALTextToSpeech",IP,9559) # Handles speech from the Nao
 
 blockList = [] # Reperesents a list of LegoBlocks. Is initialized as empty
+
+# Starts a webserver to display index.html. Is run in a separate thread
+def webServerThread():
+	Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
+	httpd = socketServer.TCPServer((",SERVERPORT),Handler)
+	httpd.serve_forever()
 
 # Decides a new lego block to add to the blockList. Randomly determined, no parameters or returns. Modifies blockList
 # Places a new block at a new layer on top of all previous blocks. Ensure the block does connect through at least
@@ -92,6 +100,9 @@ def verifyBlocks():
 
 # -------------- MAIN -------------------------
 
+# First thing, start our webserver
+thread.start_new_thread(webServerThread,())	
+			
 NaoSay("Hello! Thank you for playing my Lego Assembly game.")
 
 # First block
