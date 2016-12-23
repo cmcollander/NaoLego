@@ -83,6 +83,9 @@ def NaoSay(s):
 # This function continuously runs until there is 2 seconds of no motion on the camera. At this point, we may have the blocks on the board
 # Need to keep into account a blank board and the initial blockList before the user removes the blocks from the board
 # Returns nothing, Modifies nothing, No parameters
+# POSSIBLE IMPLEMENTATION: Obtain two sequential video frames and determine their absdiff(frame1,frame2). Obtain the average value and if
+# it is below a specified threshold, then there is no motion. Start a timer for 2 seconds whenever motion is determined and if this timer
+# ever reaches it's goal, we are good to leave the function.
 def waitForNoMotion():
 	pass
 
