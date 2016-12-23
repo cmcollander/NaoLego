@@ -29,12 +29,6 @@ def webServerThread():
 # one lego peg to the layer beneath it.
 # If the new block's x coord is less than 0, shift all blocks to the right until the block's x coord is 0.
 # The first layer is y coord 0, second is y coord 1, etc. Keep in mind that a 'standard' block is a height of 2 layers
-# Decides a new lego block to add to the blockList. Randomly determined, no parameters or returns. Modifies blockList
-# Places a new block at a new layer on top of all previous blocks. Ensure the block does connect through at least
-# one lego peg to the layer beneath it.
-# If the new block's x coord is less than 0, shift all blocks to the right until the block's x coord is 0.
-# Also be prepared to shift to the left if need be. Shouldn't happen, but is included in the functionality
-# The first layer is y coord 0, second is y coord 1, etc. Keep in mind that a 'standard' block is a height of 2 layers
 def addBlock():
 	# Find the current layer
 	layer = 0
