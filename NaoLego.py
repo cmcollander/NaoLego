@@ -66,12 +66,14 @@ def sendBlockList():
 # TODO: Write this function
 # Sends a default image for the introduction to the web server
 # No returns, no parameters, no varaible modifications, Modifies the image file for the web server (image.jpg)
+# Just need to remove image.jpg and copy resources/init_screen.jpg to image.jpg.
 def sendInitScreen():
 	pass
 
 # TODO: Write this function
 # Sends an image for the finished program to the web server
 # No returns, no parameters, no varaible modifications, Modifies the image file for the web server (image.jpg)
+# Just need to remove image.jpg and copy resources/fin_screen.jpg to image.jpg.
 def sendFinScreen():
 	pass
 
