@@ -5,7 +5,6 @@
 # TODO: Obtain data such as time to add block, number of incorrect blocks, and individual error counters for wrong coordinates, wrong color, wrong size, etc.
 # TODO: At the end of the program, save the obtained data to a CSV file for future processing.
 # TODO: Create a starting dialog for Nao to tell the user how the assembly program works
-# TODO: Have the webserver automatically refresh either the displayed image or the page itself every 1 second (or so)
 
 from LegoBlock import LegoBlock
 from naoqi import ALProxy
