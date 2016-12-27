@@ -10,6 +10,8 @@ from LegoBlock import LegoBlock
 from naoqi import ALProxy
 import SimpleHTTPServer
 import SocketServer
+import os
+from shutil import copyfile
 
 SERVERPORT = 8080 # What port number with the hosted webserver be run on?
 NUMBLOCKS = 5 # Represents the number of blocks we will assemble
@@ -68,14 +70,16 @@ def sendBlockList():
 # No returns, no parameters, no varaible modifications, Modifies the image file for the web server (image.jpg)
 # Just need to remove image.jpg and copy resources/init_screen.jpg to image.jpg.
 def sendInitScreen():
-	pass
+	os.remove('image.jpg')
+	copyfile('resources/init_screen.jpg','image.jpg')
 
 # TODO: Write this function
 # Sends an image for the finished program to the web server
 # No returns, no parameters, no varaible modifications, Modifies the image file for the web server (image.jpg)
 # Just need to remove image.jpg and copy resources/fin_screen.jpg to image.jpg.
 def sendFinScreen():
-	pass
+	os.remove('image.jpg')
+	copyfile('resources/fin_screen.jpg','image.jpg')
 
 # Tells the NAO to say a message. Takes the message as a string parameters. No returns or modifications
 def NaoSay(s):
