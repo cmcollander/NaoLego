@@ -1,10 +1,11 @@
 #! /usr/bin/python
 
-# TODO: Write functions sendBlockList, sendInitScreen, sendFinScreen, waitForNoMotion, verifyBlocks
+# TODO: Write functions sendBlockList, waitForNoMotion, verifyBlocks
 # TODO: Have the Nao relay the webserver information to the user to ensure they have the display
 # TODO: Obtain data such as time to add block, number of incorrect blocks, and individual error counters for wrong coordinates, wrong color, wrong size, etc.
 # TODO: At the end of the program, save the obtained data to a CSV file for future processing.
 # TODO: Create a starting dialog for Nao to tell the user how the assembly program works
+# TODO: Have the webserver automatically refresh either the displayed image or the page itself every 1 second (or so)
 
 from LegoBlock import LegoBlock
 from naoqi import ALProxy
@@ -65,7 +66,6 @@ def addBlock():
 def sendBlockList():
 	pass
 
-# TODO: Write this function
 # Sends a default image for the introduction to the web server
 # No returns, no parameters, no varaible modifications, Modifies the image file for the web server (image.jpg)
 # Just need to remove image.jpg and copy resources/init_screen.jpg to image.jpg.
@@ -73,7 +73,6 @@ def sendInitScreen():
 	os.remove('image.jpg')
 	copyfile('resources/init_screen.jpg','image.jpg')
 
-# TODO: Write this function
 # Sends an image for the finished program to the web server
 # No returns, no parameters, no varaible modifications, Modifies the image file for the web server (image.jpg)
 # Just need to remove image.jpg and copy resources/fin_screen.jpg to image.jpg.
