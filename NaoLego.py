@@ -129,8 +129,22 @@ def NaoSay(s):
 # it is below a specified threshold, then there is no motion. Start a timer for 2 seconds whenever motion is determined and if this timer
 # ever reaches it's goal, we are good to leave the function.
 def waitForNoMotion():
-	time.sleep(4)
+	camera = cv2.VideoCapture(0)
+	finTime = time() + 5 # 5 seconds
+	while time()<=finTime:
+		# Get 2 frames from /dev/video1
+		retval,frame1 = camera.read()
+		frame1 = perspectiveCorrection(frame1)
+		retval,frame2 = camera.read()
+		frame2 = perspectiveCorrection(frame2)
+		
+		if cv2.norm(frame1,frame2,cv2.NORM_L1)>=2000000:
+			finTime = time() + 5
 
+#TODO: jasdklfjsadlk
+def perspectiveCorrection(frame):
+	return frame
+			
 # TODO: Write this function
 # This function verifies that the blocks on the board match the blockList. Returns either True or False, with True being a match
 # No parameters, No modifications
