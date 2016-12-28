@@ -25,7 +25,7 @@ blockList = [] # Reperesents a list of LegoBlocks. Is initialized as empty
 # Starts a webserver to display index.html. Is run in a separate thread
 def webServerThread():
 	Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
-	httpd = socketServer.TCPServer((",SERVERPORT),Handler)
+	httpd = socketServer.TCPServer(("",SERVERPORT),Handler)
 	httpd.serve_forever()
 
 # Decides a new lego block to add to the blockList. Randomly determined, no parameters or returns. Modifies blockList
