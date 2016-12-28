@@ -16,7 +16,7 @@ class LegoBlock:
 
 	def setBits(self,bits):
 		for bit in bits:
-			self.bitArray |= (1<<bits)
+			self.bitArray |= (1<<bit)
 			
 	def getbitArray(self):
 		return self.bitArray
