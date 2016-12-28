@@ -13,6 +13,9 @@ import SimpleHTTPServer
 import SocketServer
 import os
 from shutil import copyfile
+import time
+import thread
+import random
 
 SERVERPORT = 8080 # What port number with the hosted webserver be run on?
 NUMBLOCKS = 5 # Represents the number of blocks we will assemble
@@ -20,14 +23,19 @@ IP = "127.0.0.1" # IP Address of the Nao. Since this is run from the Nao, this i
 tts = ALProxy("ALTextToSpeech",IP,9559) # Handles speech from the Nao
 motion = ALProxy("ALMotion","127.0.0.1",9559) # Handles joint movements for the Nao
 posture = ALProxy("ALRobotPosture","127.0.0.1",9559) # Handles postures of the robot
+Finished = False
 
-blockList = [] # Reperesents a list of LegoBlocks. Is initialized as empty
+blockList = [] # Represents a list of LegoBlocks. Is initialized as empty
 
 # Starts a webserver to display index.html. Is run in a separate thread
 def webServerThread():
+	SocketServer.TCPServer.allow_reuse_address = True
 	Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
-	httpd = socketServer.TCPServer(("",SERVERPORT),Handler)
-	httpd.serve_forever()
+	httpd = SocketServer.TCPServer(("",SERVERPORT),Handler)
+	while not Finished:
+		httpd.handle_request()
+	httpd.shutdown()
+	httpd.server_close()
 
 # Decides a new lego block to add to the blockList. Randomly determined, no parameters or returns. Modifies blockList
 # Places a new block at a new layer on top of all previous blocks. Ensure the block does connect through at least
@@ -72,19 +80,23 @@ def sendBlockList():
 # No returns, no parameters, no varaible modifications, Modifies the image file for the web server (image.jpg)
 # Just need to remove image.jpg and copy resources/init_screen.jpg to image.jpg.
 def sendInitScreen():
-	os.remove('image.jpg')
+	if os.path.isfile('image.jpg')
+		os.remove('image.jpg')
 	copyfile('resources/init_screen.jpg','image.jpg')
 
 # Sends an image for the finished program to the web server
 # No returns, no parameters, no varaible modifications, Modifies the image file for the web server (image.jpg)
 # Just need to remove image.jpg and copy resources/fin_screen.jpg to image.jpg.
 def sendFinScreen():
-	os.remove('image.jpg')
+	if os.path.isfile('image.jpg')
+		os.remove('image.jpg')
 	copyfile('resources/fin_screen.jpg','image.jpg')
 
 # Tells the NAO to say a message. Takes the message as a string parameters. No returns or modifications
 def NaoSay(s):
+	motion.setAngles("HeadPitch",0,0.1)
 	tts.say(s)
+	motion.setAngles("HeadPitch",0.5149,0.1)
 
 # TODO: Write this function
 # This function continuously runs until there is 2 seconds of no motion on the camera. At this point, we may have the blocks on the board
@@ -94,17 +106,18 @@ def NaoSay(s):
 # it is below a specified threshold, then there is no motion. Start a timer for 2 seconds whenever motion is determined and if this timer
 # ever reaches it's goal, we are good to leave the function.
 def waitForNoMotion():
-	pass
+	time.sleep(4)
 
 # TODO: Write this function
 # This function verifies that the blocks on the board match the blockList. Returns either True or False, with True being a match
 # No parameters, No modifications
 def verifyBlocks():
-	pass
+	return True
 
 # -------------- MAIN -------------------------
 
 # First thing, start our webserver
+sendInitScreen()
 thread.start_new_thread(webServerThread,())	
 
 # Get the NAO in the correct position
@@ -123,7 +136,7 @@ while not verifyBlocks:
 	waitForNoMotion()
 
 # Ready for additional blocks
-for lcv in range(NUMBlOCKS-1): # -1 since we already placed 1 block
+for lcv in range(NUMBLOCKS-1): # -1 since we already placed 1 block
 	addBlock()
 	NaoSay("Good Job. Now, please add this new block to the assembly.")
 	waitForNoMotion()
@@ -131,5 +144,6 @@ for lcv in range(NUMBlOCKS-1): # -1 since we already placed 1 block
 		NaoSay("I'm sorry, that is not the correct block. Please place the block shown in the image.")
 		waitForNoMotion()
 
+sendFinScreen()
+Finished = True
 NaoSay("Great job! I hope you enjoyed this exercise! Come play again soon!")
-posture.goToPosture("SitRelax",1.0)
