@@ -12,7 +12,15 @@ class LegoBlock:
 		self.coords = (x,y) # Coordinates are stored as a tuple
 		self.x = x
 		self.y = y
+		self.bitArray = 0b0000 # Represents if a block's connectors are connected to the layer above. Inits as all unconnected
 
+	def setBits(self,bits):
+		for bit in bits:
+			self.bitArray |= (1<<bits)
+			
+	def getbitArray(self):
+		return self.bitArray
+	
 	def getWidth(self):
 		return self.width
 
