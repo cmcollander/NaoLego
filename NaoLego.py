@@ -16,6 +16,8 @@ from shutil import copyfile
 import time
 import thread
 import random
+import numpy as np
+import cv2
 
 SERVERPORT = 8080 # What port number with the hosted webserver be run on?
 NUMBLOCKS = 5 # Represents the number of blocks we will assemble
@@ -64,13 +66,14 @@ def addBlock():
 	blockList.append(newBlock) # Place our new block into our blockList
 	
 	# Find the block in the layer beneath and set any connected connectors to 1
-	thisBlockXList = range(newBlock.x,newBlock.x+newBlock.width)
-	prevBlock = v[-2]
-	prevBlockXList = range(prevBlock.x,prevBlock.x+prevBlock.width)
-	inter = list(set(thisBlockXList)&set(prevBlockXList))
-	subVal = inter[0]
-	inter[:] = [x - subVal for x in inter]
-	prevBlock.setBits(inter)
+	if len(blockList)>=2:
+		thisBlockXList = range(newBlock.x,newBlock.x+newBlock.width)
+		prevBlock = blockList[-2]
+		prevBlockXList = range(prevBlock.x,prevBlock.x+prevBlock.width)
+		inter = list(set(thisBlockXList)&set(prevBlockXList))
+		subVal = inter[0]
+		inter[:] = [x - subVal for x in inter]
+		prevBlock.setBits(inter)
 	
 	# Shift all blocks to the right so they are all nonnegative coordinates
 	v = []
