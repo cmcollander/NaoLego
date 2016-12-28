@@ -80,7 +80,7 @@ def sendBlockList():
 # No returns, no parameters, no varaible modifications, Modifies the image file for the web server (image.jpg)
 # Just need to remove image.jpg and copy resources/init_screen.jpg to image.jpg.
 def sendInitScreen():
-	if os.path.isfile('image.jpg')
+	if os.path.isfile('image.jpg'):
 		os.remove('image.jpg')
 	copyfile('resources/init_screen.jpg','image.jpg')
 
@@ -88,7 +88,7 @@ def sendInitScreen():
 # No returns, no parameters, no varaible modifications, Modifies the image file for the web server (image.jpg)
 # Just need to remove image.jpg and copy resources/fin_screen.jpg to image.jpg.
 def sendFinScreen():
-	if os.path.isfile('image.jpg')
+	if os.path.isfile('image.jpg'):
 		os.remove('image.jpg')
 	copyfile('resources/fin_screen.jpg','image.jpg')
 
