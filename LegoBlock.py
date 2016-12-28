@@ -11,12 +11,6 @@ class LegoBlock:
 		self.color = col # Color is currently a string. May change to RGB value or MatPlotLib Color object in the future
 		self.coords = (x,y) # Coordinates are stored as a tuple
 
-	def __init__(self):
-		self.width = 0
-		self.height = 0
-		self.color = "NONE"
-		self.coords = (0,0)
-
 	def getWidth(self):
 		return self.width
 
