@@ -47,8 +47,8 @@ def addBlock():
 	layer = 0
 	for block in blockList:
 		layer += block.getHeight() # Increase Layer by the height of the block
-	height = random.choice([1,2]) # The height can be either 1 or 2
-	width = random.randrange(1,5) # The width can be between 1 and 4
+	height = 1 # We are currently only using blocks of height 1
+	width = random.choice([2,4]) # The width can be 2 or 4
 
 	if layer==0:
 		x = 0 # Our first block is placed at the origin
@@ -59,9 +59,19 @@ def addBlock():
 		right = below.width+below.x - 1 # Obtain our rightmost possible location
 		x = random.randrange(left,right+1) # The X coordinate is determined from Left and Right
 		y = layer # The Y coordinate is the current layer
-	color = random.choice(["BLUE","RED","GREEN","YELLOW"]) # Find our color from these selections
+	color = random.choice(["BLUE","RED","GREEN"]) # Find our color from these selections
 	newBlock = LegoBlock(width,height,color,x,y) # Create our new block from the generated information
 	blockList.append(newBlock) # Place our new block into our blockList
+	
+	# Find the block in the layer beneath and set any connected connectors to 1
+	thisBlockXList = range(newBlock.x,newBlock.x+newBlock.width)
+	prevBlock = v[-2]
+	prevBlockXList = range(prevBlock.x,prevBlock.x+prevBlock.width)
+	inter = list(set(thisBlockXList)&set(prevBlockXList))
+	subVal = inter[0]
+	inter[:] = [x - subVal for x in inter]
+	prevBlock.setBits(inter)
+	
 	# Shift all blocks to the right so they are all nonnegative coordinates
 	v = []
 	for block in blockList:
