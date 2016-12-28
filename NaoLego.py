@@ -59,7 +59,7 @@ def addBlock():
 		right = below.width+below.x - 1 # Obtain our rightmost possible location
 		x = random.randrange(left,right+1) # The X coordinate is determined from Left and Right
 		y = layer # The Y coordinate is the current layer
-	color = random.choice(["BLUE","RED","GREEN"]) # Find our color from these selections
+	color = random.choice([(255,0,0),(0,255,0),(0,0,255)]) # Find our color from these selections
 	newBlock = LegoBlock(width,height,color,x,y) # Create our new block from the generated information
 	blockList.append(newBlock) # Place our new block into our blockList
 	
@@ -84,7 +84,17 @@ def addBlock():
 # Creates an image of the blockList and sends it out to a web server
 # No returns, No parameters, No variable modifications, Modifies the image file for the web server (image.jpg)
 def sendBlockList():
-	pass
+	img = np.zeros((5,16,3), np.uint8)
+	for x in range(16):
+		for y in range(5):
+			img[y,x] = (255,255,255)
+	for block in blockList:
+		y = block.y
+		for x in range(block.x,block.x+block.width):
+			img[y,x] = block.color
+	res = cv2.resize(img, None, fx=60, fy=60, interpolation=cv2.INTER_NEAREST)
+	res = cv2.flip(res,0)
+	cv2.imwrite('image.jpg', res)
 
 # Sends a default image for the introduction to the web server
 # No returns, no parameters, no varaible modifications, Modifies the image file for the web server (image.jpg)
@@ -148,6 +158,7 @@ while not verifyBlocks:
 # Ready for additional blocks
 for lcv in range(NUMBLOCKS-1): # -1 since we already placed 1 block
 	addBlock()
+	sendBlockList()
 	NaoSay("Good Job. Now, please add this new block to the assembly.")
 	waitForNoMotion()
 	while not verifyBlocks:
