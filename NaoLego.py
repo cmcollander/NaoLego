@@ -6,7 +6,6 @@
 # TODO: At the end of the program, save the obtained data to a CSV file for future processing.
 # TODO: Create a starting dialog for Nao to tell the user how the assembly program works
 # TODO: Create a predefined posture named InitNaoLego for the NAO to start at (standing tall, looking down at calibration board)
-# TODO: Write code to place NAO in initNaoLego posture at start of program and SitRelax at end of program
 
 from LegoBlock import LegoBlock
 from naoqi import ALProxy
@@ -19,6 +18,8 @@ SERVERPORT = 8080 # What port number with the hosted webserver be run on?
 NUMBLOCKS = 5 # Represents the number of blocks we will assemble
 IP = "127.0.0.1" # IP Address of the Nao. Since this is run from the Nao, this is localhost
 tts = ALProxy("ALTextToSpeech",IP,9559) # Handles speech from the Nao
+motion = ALProxy("ALMotion","127.0.0.1",9559) # Handles joint movements for the Nao
+posture = ALProxy("ALRobotPosture","127.0.0.1",9559) # Handles postures of the robot
 
 blockList = [] # Reperesents a list of LegoBlocks. Is initialized as empty
 
@@ -105,6 +106,10 @@ def verifyBlocks():
 
 # First thing, start our webserver
 thread.start_new_thread(webServerThread,())	
+
+# Get the NAO in the correct position
+posture.goToPosture("StandInit",1.0)
+motion.setAngles("HeadPitch",0.5149,0.1)
 			
 NaoSay("Hello! Thank you for playing my Lego Assembly game.")
 
@@ -127,3 +132,4 @@ for lcv in range(NUMBlOCKS-1): # -1 since we already placed 1 block
 		waitForNoMotion()
 
 NaoSay("Great job! I hope you enjoyed this exercise! Come play again soon!")
+posture.goToPosture("SitRelax",1.0)
