@@ -5,6 +5,8 @@
 # TODO: Obtain data such as time to add block, number of incorrect blocks, and individual error counters for wrong coordinates, wrong color, wrong size, etc.
 # TODO: At the end of the program, save the obtained data to a CSV file for future processing.
 # TODO: Create a starting dialog for Nao to tell the user how the assembly program works
+# TODO: Create a predefined posture named InitNaoLego for the NAO to start at (standing tall, looking down at calibration board)
+# TODO: Write code to place NAO in initNaoLego posture at start of program and SitRelax at end of program
 
 from LegoBlock import LegoBlock
 from naoqi import ALProxy
