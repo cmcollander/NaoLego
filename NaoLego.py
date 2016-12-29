@@ -25,8 +25,24 @@ motion = ALProxy("ALMotion","127.0.0.1",9559) # Handles joint movements for the 
 posture = ALProxy("ALRobotPosture","127.0.0.1",9559) # Handles postures of the robot
 camera = ALProxy("ALPhotoCapture","127.0.0.1",9559) # Handles the camera of the robot
 Finished = False
-perspective_mat = None
-HEADANGLE = 0.30
+perspective_mat = None # Holds the transformation matrix for the visual perspective
+HEADANGLE = 0.28 # Calibrated so he does not see his feet
+
+# What lego blocks do we have?
+presentBlockList = [] # Represents the list of LegoBlocks we actually have
+red4x1 = LegoBlock(4,1,(0,0,255),0,0)
+green4x1 = LegoBlock(4,1,(0,255,0),0,0)
+blue4x1 = LegoBlock(4,1,(255,0,0),0,0)
+red2x1 = LegoBlock(2,1,(0,0,255),0,0)
+green2x1 = LegoBlock(2,1,(0,255,0),0,0)
+blue2x1 = LegoBlock(2,1,(255,0,0),0,0)
+presentBlockList.append(red4x1)
+presentBlockList.append(green4x1)
+presentBlockList.extend(4*[blue4x1])
+presentBlockList.extend(3*[red2x1])
+presentBlockList.extend(3*[green2x1])
+presentBlockList.extend(2*[blue2x1])
+shuffle(presentBlockList) # Shuffle our presentBlockList
 
 blockList = [] # Represents a list of LegoBlocks. Is initialized as empty
 
@@ -46,9 +62,8 @@ def webServerThread():
 	httpd.shutdown()
 	httpd.server_close()
 
-# Decides a new lego block to add to the blockList. Randomly determined, no parameters or returns. Modifies blockList
-# Places a new block at a new layer on top of all previous blocks. Ensure the block does connect through at least
-# one lego peg to the layer beneath it.
+# Decides a new lego block to add to the blockList. Randomly determined from list of available blocks, no parameters or returns. Modifies blockList
+# Places a new block at a new layer on top of all previous blocks. Ensure the block does connect through at least one lego peg to the layer beneath it.
 # If the new block's x coord is less than 0, shift all blocks to the right until the block's x coord is 0.
 # The first layer is y coord 0, second is y coord 1, etc. Keep in mind that a 'standard' block is a height of 2 layers
 def addBlock():
@@ -56,20 +71,17 @@ def addBlock():
 	layer = 0
 	for block in blockList:
 		layer += block.getHeight() # Increase Layer by the height of the block
-	height = 1 # We are currently only using blocks of height 1
-	width = random.choice([2,4]) # The width can be 2 or 4
+	newBlock = presentBlockList.pop() # Get a new block from our presentBlockList
+	height = newBlock.getHeight()
+	width = newBlock.getWidth()
 
 	if layer==0:
-		x = 0 # Our first block is placed at the origin
-		y = 0 # Our first block is placed at the origin
+		newBlock.setCoords(0,0) # Our first block is placed at the origin
 	else: # If this is not our first block...
 		below = blockList[-1] # Obtain the block on the below layer, which should be the last placed in the list
 		left = below.x-(width-1) # Obtain our leftmost possible location
 		right = below.width+below.x - 1 # Obtain our rightmost possible location
-		x = random.randrange(left,right+1) # The X coordinate is determined from Left and Right
-		y = layer # The Y coordinate is the current layer
-	color = random.choice([(255,0,0),(0,255,0),(0,0,255)]) # Find our color from these selections
-	newBlock = LegoBlock(width,height,color,x,y) # Create our new block from the generated information
+		newBlock.setCoords(random.randrange(left,right+1),layer) # The X coordinate is determined from Left and Right, The Y coordinate is the current layer
 	blockList.append(newBlock) # Place our new block into our blockList
 	
 	# Find the block in the layer beneath and set any connected connectors to 1
