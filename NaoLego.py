@@ -154,7 +154,7 @@ def order_points(pts):
 	rect = np.zeros((4,2),dtype="float32")
 	s=pts.sum(axis=1)
 	rect[0] = pts[np.argmin(s)]
-	rect[2] = pts[np.argmax(2)]
+	rect[2] = pts[np.argmax(s)]
 	diff = np.diff(pts,axis=1)
 	rect[1] = pts[np.argmin(diff)]
 	rect[3] = pts[np.argmax(diff)]
@@ -178,11 +178,19 @@ def initPerspective():
 		[cols - 1, rows - 1],
 		[0, rows - 1]], dtype = "float32")
 	perspective_mat = cv2.getPerspectiveTransform(perspective_pts,dst)
+	# Create an image of our initial image overlayed with our perspective points
+	p_img = img
+	p_list = perspective_pts.tolist()
+	cv2.circle(p_img,(p_list[0][0],p_list[0][1]),10,(255,0,0),-1)
+	cv2.circle(p_img,(p_list[1][0],p_list[1][1]),10,(0,255,0),-1)
+	cv2.circle(p_img,(p_list[2][0],p_list[2][1]),10,(0,0,255),-1)
+	cv2.circle(p_img,(p_list[3][0],p_list[3][1]),10,(0,0,0),-1)
+	cv2.imwrite("perspective.jpg",p_img)
 	
 			
 # Apply perspective correction
 def perspectiveCorrection(frame):
-	return cv2.warpPerspective(image,perspective_mat,(rows,cols))
+	return cv2.warpPerspective(frame,perspective_mat,(rows,cols))
 			
 # TODO: Write this function
 # This function verifies that the blocks on the board match the blockList. Returns either True or False, with True being a match
