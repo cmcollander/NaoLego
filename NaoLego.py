@@ -128,25 +128,19 @@ def NaoSay(s):
 	tts.say(s)
 	motion.setAngles("HeadPitch",0.5149,0.1)
 
-# TODO: Write this function
-# This function continuously runs until there is 2 seconds of no motion on the camera. At this point, we may have the blocks on the board
+# This function continuously runs until there is 5 seconds of no motion on the camera. At this point, we may have the blocks on the board
 # Need to keep into account a blank board and the initial blockList before the user removes the blocks from the board
 # Returns nothing, Modifies nothing, No parameters
-# POSSIBLE IMPLEMENTATION: Obtain two sequential video frames and determine their absdiff(frame1,frame2). Obtain the average value and if
-# it is below a specified threshold, then there is no motion. Start a timer for 2 seconds whenever motion is determined and if this timer
-# ever reaches it's goal, we are good to leave the function.
 def waitForNoMotion():
-	camera = cv2.VideoCapture(0)
-	finTime = time() + 5 # 5 seconds
-	while time()<=finTime:
+	finTime = time.time() + 5 # 5 seconds
+	while time.time()<=finTime:
 		# Get 2 frames from /dev/video1
-		retval,frame1 = camera.read()
-		frame1 = perspectiveCorrection(frame1)
-		retval,frame2 = camera.read()
-		frame2 = perspectiveCorrection(frame2)
-		
-		if cv2.norm(frame1,frame2,cv2.NORM_L1)>=2000000:
-			finTime = time() + 5
+		pics = camera.takePictures(2,"/home/nao/","frame")
+		frame1 = cv2.imread(pics[0][0])
+		frame2 = cv2.imread(pics[0][1])
+		# Compare the two frames
+		if cv2.norm(frame1,frame2,cv2.NORM_L1)>=10000000:
+			finTime = time.time() + 5
 
 #TODO: jasdklfjsadlk
 def perspectiveCorrection(frame):
