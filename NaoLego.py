@@ -1,11 +1,9 @@
 #! /usr/bin/python
 
-# TODO: Write functions sendBlockList, waitForNoMotion, verifyBlocks
-# TODO: Have the Nao relay the webserver information to the user to ensure they have the display
+# TODO: Write functions sendBlockList, waitForHeadTouch, verifyBlocks
+# TODO: Pull blocks for AddBlock from a list of blocks that we actually have
 # TODO: Obtain data such as time to add block, number of incorrect blocks, and individual error counters for wrong coordinates, wrong color, wrong size, etc.
 # TODO: At the end of the program, save the obtained data to a CSV file for future processing.
-# TODO: Create a starting dialog for Nao to tell the user how the assembly program works
-# TODO: Create a predefined posture named InitNaoLego for the NAO to start at (standing tall, looking down at calibration board)
 
 from LegoBlock import LegoBlock
 from naoqi import ALProxy
@@ -92,7 +90,8 @@ def addBlock():
 	for block in blockList:
 		block.x = block.x + offset
 
-# TODO: Write this function
+# TODO: Improve this function with nubs indicating connectors
+# TODO: After image creation, add to a 640x480 image without distorting image for easier web display
 # Creates an image of the blockList and sends it out to a web server
 # No returns, No parameters, No variable modifications, Modifies the image file for the web server (image.jpg)
 def sendBlockList():
@@ -108,7 +107,7 @@ def sendBlockList():
 	res = cv2.flip(res,0)
 	cv2.imwrite('image.jpg', res)
 
-# Sends a default image for the introduction to the web server
+# Sends a default image for the introduction of the application
 # No returns, no parameters, no varaible modifications, Modifies the image file for the web server (image.jpg)
 # Just need to remove image.jpg and copy resources/init_screen.jpg to image.jpg.
 def sendInitScreen():
@@ -126,26 +125,15 @@ def sendFinScreen():
 
 # Tells the NAO to say a message. Takes the message as a string parameters. No returns or modifications
 def NaoSay(s):
-	motion.setAngles("HeadPitch",0,0.1)
-	tts.say(s)
-	motion.setAngles("HeadPitch",HEADANGLE,0.1)
+	motion.setAngles("HeadPitch",0,0.1) # Look at the user
+	tts.say(s) # Say our message
+	motion.setAngles("HeadPitch",HEADANGLE,0.1) # Return to board
 
-# This function continuously runs until there is 5 seconds of no motion on the camera. At this point, we may have the blocks on the board
-# Need to keep into account a blank board and the initial blockList before the user removes the blocks from the board
-# Returns nothing, Modifies nothing, No parameters
-def waitForNoMotion():
-	finTime = time.time() + 5 # 5 seconds
-	while time.time()<=finTime:
-		# Get 2 frames from /dev/video1
-		pics = camera.takePictures(2,"/home/nao/NaoLego/","frame")
-		frame1 = perspectiveCorrection(cv2.imread(pics[0][0]))
-		frame2 = perspectiveCorrection(cv2.imread(pics[0][1]))
-		# Resave our two frames
-		cv2.imwrite("frame_0_p.jpg",frame1)
-		cv2.imwrite("frame_1_p.jpg",frame2)
-		# Compare the two frames
-		if False: #cv2.norm(frame1,frame2,cv2.NORM_L1)>=10000:
-			finTime = time.time() + 5
+# TODO: Write this function
+# The nao will prompt the user and wait until his head receives contact
+def waitForHeadTouch():
+	tts.say("Please touch my head when you are ready.")
+	time.sleep(5)
 
 # Ensure that for our perspective we have a consistent ordering of points
 # http://www.pyimagesearch.com/2014/08/25/4-point-opencv-getperspective-transform-example/
@@ -205,31 +193,35 @@ initCamera()
 
 # Get the NAO in the correct position
 posture.goToPosture("StandInit",1.0)
-motion.setAngles("HeadPitch",HEADANGLE,0.1)
+			
+NaoSay("Hello! Thank you for playing my Lego Assembly game."
+       "First, please ensure that the board in front of me is clear and you have logged into my webserver."
+       "My server address is 192.168.1.12 port 8 0 8 0.")
+waitForHeadTouch()
 
 # Determine the points of our paper and our perspective
+motion.setAngles("HeadPitch",HEADANGLE,0.1)
+time.sleep(1) # Allow time for our head to reach the correct location before obtaining points
 initPerspective()
-			
-NaoSay("Hello! Thank you for playing my Lego Assembly game.")
 
 # First block
 addBlock()
 NaoSay("Lets start by adding a single block")
 sendBlockList()
-waitForNoMotion()
+waitForHeadTouch()
 while not verifyBlocks:
 	NaoSay("I'm sorry, that is not the correct block. Please place the block shown in the image.")
-	waitForNoMotion()
+	waitForHeadTouch()
 
 # Ready for additional blocks
 for lcv in range(NUMBLOCKS-1): # -1 since we already placed 1 block
 	addBlock()
 	sendBlockList()
 	NaoSay("Good Job. Now, please add this new block to the assembly.")
-	waitForNoMotion()
+	waitForHeadTouch()
 	while not verifyBlocks:
 		NaoSay("I'm sorry, that is not the correct block. Please place the block shown in the image.")
-		waitForNoMotion()
+		waitForHeadTouch()
 
 sendFinScreen()
 Finished = True
