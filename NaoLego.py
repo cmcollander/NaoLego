@@ -142,10 +142,10 @@ def waitForNoMotion():
 		frame1 = perspectiveCorrection(cv2.imread(pics[0][0]))
 		frame2 = perspectiveCorrection(cv2.imread(pics[0][1]))
 		# Resave our two frames
-		cv2.imwrite("frame_0.jpg",frame1)
-		cv2.imwrite("frame_1.jpg",frame2)
+		cv2.imwrite("frame_0_p.jpg",frame1)
+		cv2.imwrite("frame_1_p.jpg",frame2)
 		# Compare the two frames
-		if cv2.norm(frame1,frame2,cv2.NORM_L1)>=10000:
+		if False #cv2.norm(frame1,frame2,cv2.NORM_L1)>=10000:
 			finTime = time.time() + 5
 
 # Ensure that for our perspective we have a consistent ordering of points
@@ -162,6 +162,9 @@ def order_points(pts):
 			
 # Obtain an image of the blank paper and determine our critical points and our perspective matrix
 def initPerspective():
+	global rows
+	global cols
+	global perspective_mat
 	pics = camera.takePictures(2,"/home/nao/NaoLego/","frame")
 	img = cv2.imread(pics[0][0])
 	gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
@@ -174,12 +177,12 @@ def initPerspective():
 		[cols - 1, 0],
 		[cols - 1, rows - 1],
 		[0, rows - 1]], dtype = "float32")
-	perspective_mat = cv2.getPerspectiveTransform(corners,dst)
+	perspective_mat = cv2.getPerspectiveTransform(perspective_pts,dst)
 	
 			
 # Apply perspective correction
 def perspectiveCorrection(frame):
-	return cvw.warpPerspective(image,perspective_mat,(rows,cols))
+	return cv2.warpPerspective(image,perspective_mat,(rows,cols))
 			
 # TODO: Write this function
 # This function verifies that the blocks on the board match the blockList. Returns either True or False, with True being a match
