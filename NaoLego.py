@@ -150,8 +150,8 @@ def order_points(pts):
 # Obtain an image of the blank paper and determine our critical points and our perspective matrix
 def initPerspective():
 	global perspective_mat
-	pics = camera.takePictures(2,"/home/nao/NaoLego/","frame")
-	img = cv2.imread(pics[0][0])
+	pic = camera.takePicture("/home/nao/NaoLego/","frame")
+	img = cv2.imread(pic[0])
 	gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 	corners = cv2.goodFeaturesToTrack(gray,4,0.01,10)
 	corners = np.float32([corners[0][0],corners[1][0],corners[2][0],corners[3][0]])
@@ -180,6 +180,8 @@ def perspectiveCorrection(frame):
 # This function verifies that the blocks on the board match the blockList. Returns either True or False, with True being a match
 # No parameters, No modifications
 def verifyBlocks():
+	pic = camera.takePicture("/home/nao/NaoLego/","frame")
+	img = cv2.imread(pic[0])
 	return True
 
 # -------------- MAIN -------------------------
@@ -194,9 +196,7 @@ initCamera()
 # Get the NAO in the correct position
 posture.goToPosture("StandInit",1.0)
 			
-NaoSay("Hello! Thank you for playing my Lego Assembly game."
-       "First, please ensure that the board in front of me is clear and you have logged into my webserver."
-       "My server address is 192.168.1.12 port 8 0 8 0.")
+NaoSay("Hello! Thank you for playing my Lego Assembly game. First, please ensure that the board in front of me is clear and you have logged into my webserver. My server address is 192.168.1.12 port 8 0 8 0.")
 waitForHeadTouch()
 
 # Determine the points of our paper and our perspective
