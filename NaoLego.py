@@ -145,7 +145,7 @@ def waitForNoMotion():
 		cv2.imwrite("frame_0_p.jpg",frame1)
 		cv2.imwrite("frame_1_p.jpg",frame2)
 		# Compare the two frames
-		if False #cv2.norm(frame1,frame2,cv2.NORM_L1)>=10000:
+		if False: #cv2.norm(frame1,frame2,cv2.NORM_L1)>=10000:
 			finTime = time.time() + 5
 
 # Ensure that for our perspective we have a consistent ordering of points
@@ -181,10 +181,10 @@ def initPerspective():
 	# Create an image of our initial image overlayed with our perspective points
 	p_img = img
 	p_list = perspective_pts.tolist()
-	cv2.circle(p_img,(p_list[0][0],p_list[0][1]),10,(255,0,0),-1)
-	cv2.circle(p_img,(p_list[1][0],p_list[1][1]),10,(0,255,0),-1)
-	cv2.circle(p_img,(p_list[2][0],p_list[2][1]),10,(0,0,255),-1)
-	cv2.circle(p_img,(p_list[3][0],p_list[3][1]),10,(0,0,0),-1)
+	cv2.circle(p_img,(int(p_list[0][0]),int(p_list[0][1])),10,(255,0,0),-1)
+	cv2.circle(p_img,(int(p_list[1][0]),int(p_list[1][1])),10,(0,255,0),-1)
+	cv2.circle(p_img,(int(p_list[2][0]),int(p_list[2][1])),10,(0,0,255),-1)
+	cv2.circle(p_img,(int(p_list[3][0]),int(p_list[3][1])),10,(0,0,0),-1)
 	cv2.imwrite("perspective.jpg",p_img)
 	
 			
