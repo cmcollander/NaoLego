@@ -28,8 +28,7 @@ posture = ALProxy("ALRobotPosture","127.0.0.1",9559) # Handles postures of the r
 camera = ALProxy("ALPhotoCapture","127.0.0.1",9559) # Handles the camera of the robot
 Finished = False
 perspective_mat = None
-rows = None
-cols = None
+HEADANGLE = 0.48
 
 blockList = [] # Represents a list of LegoBlocks. Is initialized as empty
 
@@ -129,7 +128,7 @@ def sendFinScreen():
 def NaoSay(s):
 	motion.setAngles("HeadPitch",0,0.1)
 	tts.say(s)
-	motion.setAngles("HeadPitch",0.5149,0.1)
+	motion.setAngles("HeadPitch",HEADANGLE,0.1)
 
 # This function continuously runs until there is 5 seconds of no motion on the camera. At this point, we may have the blocks on the board
 # Need to keep into account a blank board and the initial blockList before the user removes the blocks from the board
@@ -162,8 +161,6 @@ def order_points(pts):
 			
 # Obtain an image of the blank paper and determine our critical points and our perspective matrix
 def initPerspective():
-	global rows
-	global cols
 	global perspective_mat
 	pics = camera.takePictures(2,"/home/nao/NaoLego/","frame")
 	img = cv2.imread(pics[0][0])
@@ -171,12 +168,11 @@ def initPerspective():
 	corners = cv2.goodFeaturesToTrack(gray,4,0.01,10)
 	corners = np.float32([corners[0][0],corners[1][0],corners[2][0],corners[3][0]])
 	perspective_pts = order_points(corners)
-	rows,cols = img.shape[:2]
 	dst = np.array([
 		[0, 0],
-		[cols - 1, 0],
-		[cols - 1, rows - 1],
-		[0, rows - 1]], dtype = "float32")
+		[639, 0],
+		[639, 479],
+		[0, 479]], dtype = "float32")
 	perspective_mat = cv2.getPerspectiveTransform(perspective_pts,dst)
 	# Create an image of our initial image overlayed with our perspective points
 	p_img = img
@@ -190,7 +186,7 @@ def initPerspective():
 			
 # Apply perspective correction
 def perspectiveCorrection(frame):
-	return cv2.warpPerspective(frame,perspective_mat,(rows,cols))
+	return cv2.warpPerspective(frame,perspective_mat,(640,480))
 			
 # TODO: Write this function
 # This function verifies that the blocks on the board match the blockList. Returns either True or False, with True being a match
@@ -209,7 +205,7 @@ initCamera()
 
 # Get the NAO in the correct position
 posture.goToPosture("StandInit",1.0)
-motion.setAngles("HeadPitch",0.5149,0.1)
+motion.setAngles("HeadPitch",HEADANGLE,0.1)
 
 # Determine the points of our paper and our perspective
 initPerspective()
