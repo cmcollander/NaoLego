@@ -16,7 +16,6 @@ import thread
 import random
 import numpy as np
 import cv2
-import copy
 
 SERVERPORT = 8080 # What port number with the hosted webserver be run on?
 NUMBLOCKS = 5 # Represents the number of blocks we will assemble
@@ -33,16 +32,30 @@ HEADANGLE = 0.28 # Calibrated so he does not see his feet
 presentBlockList = [] # Represents the list of LegoBlocks we actually have
 red4x1 = LegoBlock(4,1,(0,0,255),0,0)
 green4x1 = LegoBlock(4,1,(0,255,0),0,0)
-blue4x1 = LegoBlock(4,1,(255,0,0),0,0)
-red2x1 = LegoBlock(2,1,(0,0,255),0,0)
-green2x1 = LegoBlock(2,1,(0,255,0),0,0)
-blue2x1 = LegoBlock(2,1,(255,0,0),0,0)
+blue4x1a = LegoBlock(4,1,(255,0,0),0,0)
+blue4x1b = LegoBlock(4,1,(255,0,0),0,0)
+blue4x1c = LegoBlock(4,1,(255,0,0),0,0)
+blue4x1d = LegoBlock(4,1,(255,0,0),0,0)
+red2x1a = LegoBlock(2,1,(0,0,255),0,0)
+red2x1b = LegoBlock(2,1,(0,0,255),0,0)
+green2x1a = LegoBlock(2,1,(0,255,0),0,0)
+green2x1b = LegoBlock(2,1,(0,255,0),0,0)
+green2x1c = LegoBlock(2,1,(0,255,0),0,0)
+blue2x1a = LegoBlock(2,1,(255,0,0),0,0)
+blue2x1b = LegoBlock(2,1,(255,0,0),0,0)
 presentBlockList.append(red4x1)
 presentBlockList.append(green4x1)
-presentBlockList.extend(4*[copy.deepcopy(blue4x1)])
-presentBlockList.extend(3*[copy.deepcopy(red2x1)])
-presentBlockList.extend(3*[copy.deepcopy(green2x1)])
-presentBlockList.extend(2*[copy.deepcopy(blue2x1)])
+presentBlockList.append(blue4x1a)
+presentBlockList.append(blue4x1b)
+presentBlockList.append(blue4x1c)
+presentBlockList.append(blue4x1d)
+presentBlockList.append(red2x1a)
+presentBlockList.append(red2x1b)
+presentBlockList.append(green2x1a)
+presentBlockList.append(green2x1b)
+presentBlockList.append(green2x1c)
+presentBlockList.append(blue2x1a)
+presentBlockList.append(blue2x1b)
 random.shuffle(presentBlockList) # Shuffle our presentBlockList
 
 blockList = [] # Represents a list of LegoBlocks. Is initialized as empty
