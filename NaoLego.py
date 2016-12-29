@@ -16,6 +16,7 @@ import thread
 import random
 import numpy as np
 import cv2
+import copy
 
 SERVERPORT = 8080 # What port number with the hosted webserver be run on?
 NUMBLOCKS = 5 # Represents the number of blocks we will assemble
@@ -38,10 +39,10 @@ green2x1 = LegoBlock(2,1,(0,255,0),0,0)
 blue2x1 = LegoBlock(2,1,(255,0,0),0,0)
 presentBlockList.append(red4x1)
 presentBlockList.append(green4x1)
-presentBlockList.extend(4*[blue4x1])
-presentBlockList.extend(3*[red2x1])
-presentBlockList.extend(3*[green2x1])
-presentBlockList.extend(2*[blue2x1])
+presentBlockList.extend(4*[copy.deepcopy(blue4x1)])
+presentBlockList.extend(3*[copy.deepcopy(red2x1)])
+presentBlockList.extend(3*[copy.deepcopy(green2x1)])
+presentBlockList.extend(2*[copy.deepcopy(blue2x1)])
 random.shuffle(presentBlockList) # Shuffle our presentBlockList
 
 blockList = [] # Represents a list of LegoBlocks. Is initialized as empty
