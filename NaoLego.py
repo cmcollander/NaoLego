@@ -27,7 +27,7 @@ motion = ALProxy("ALMotion","127.0.0.1",9559) # Handles joint movements for the 
 posture = ALProxy("ALRobotPosture","127.0.0.1",9559) # Handles postures of the robot
 camera = ALProxy("ALPhotoCapture","127.0.0.1",9559) # Handles the camera of the robot
 Finished = False
-perspective_points = None
+perspective_pts = None
 
 blockList = [] # Represents a list of LegoBlocks. Is initialized as empty
 
@@ -159,9 +159,7 @@ def order_points(pts):
 	return rect
 
 def four_point_transform(image, pts):
-	# obtain a consistent order of the points and unpack them
-	# individually
-	rect = order_points(pts)
+	rect = points
 	(tl, tr, br, bl) = rect
 	
 	# compute the width of the new image, which will be the
@@ -206,6 +204,7 @@ def initPerspective():
 	pts = [list(corners[i][0]) for i in range(0,4)]
 	pts = np.array(pts,"float32")
 	perspective_pts = order_points(pts)
+	print perspective_pts
 	
 			
 #TODO: jasdklfjsadlk
