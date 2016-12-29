@@ -28,7 +28,7 @@ posture = ALProxy("ALRobotPosture","127.0.0.1",9559) # Handles postures of the r
 camera = ALProxy("ALPhotoCapture","127.0.0.1",9559) # Handles the camera of the robot
 Finished = False
 perspective_mat = None
-HEADANGLE = 0.48
+HEADANGLE = 0.30
 
 blockList = [] # Represents a list of LegoBlocks. Is initialized as empty
 
