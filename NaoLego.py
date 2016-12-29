@@ -42,7 +42,7 @@ presentBlockList.extend(4*[blue4x1])
 presentBlockList.extend(3*[red2x1])
 presentBlockList.extend(3*[green2x1])
 presentBlockList.extend(2*[blue2x1])
-shuffle(presentBlockList) # Shuffle our presentBlockList
+random.shuffle(presentBlockList) # Shuffle our presentBlockList
 
 blockList = [] # Represents a list of LegoBlocks. Is initialized as empty
 
@@ -223,7 +223,7 @@ addBlock()
 NaoSay("Lets start by adding a single block")
 sendBlockList()
 waitForHeadTouch()
-while not verifyBlocks:
+while not verifyBlocks():
 	NaoSay("I'm sorry, that is not the correct block. Please place the block shown in the image.")
 	waitForHeadTouch()
 
@@ -233,7 +233,7 @@ for lcv in range(NUMBLOCKS-1): # -1 since we already placed 1 block
 	sendBlockList()
 	NaoSay("Good Job. Now, please add this new block to the assembly.")
 	waitForHeadTouch()
-	while not verifyBlocks:
+	while not verifyBlocks():
 		NaoSay("I'm sorry, that is not the correct block. Please place the block shown in the image.")
 		waitForHeadTouch()
 
