@@ -27,7 +27,9 @@ motion = ALProxy("ALMotion","127.0.0.1",9559) # Handles joint movements for the 
 posture = ALProxy("ALRobotPosture","127.0.0.1",9559) # Handles postures of the robot
 camera = ALProxy("ALPhotoCapture","127.0.0.1",9559) # Handles the camera of the robot
 Finished = False
-perspective_pts = None
+perspective_mat = None
+rows = None
+cols = None
 
 blockList = [] # Represents a list of LegoBlocks. Is initialized as empty
 
@@ -157,42 +159,6 @@ def order_points(pts):
 	rect[1] = pts[np.argmin(diff)]
 	rect[3] = pts[np.argmax(diff)]
 	return rect
-
-def four_point_transform(image, pts):
-	rect = points
-	(tl, tr, br, bl) = rect
-	
-	# compute the width of the new image, which will be the
-	# maximum distance between bottom-right and bottom-left
-	# x-coordiates or the top-right and top-left x-coordinates
-	widthA = np.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
-	widthB = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
-	maxWidth = max(int(widthA), int(widthB))
-	
-	# compute the height of the new image, which will be the
-	# maximum distance between the top-right and bottom-right
-	# y-coordinates or the top-left and bottom-left y-coordinates
-	heightA = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
-	heightB = np.sqrt(((tl[0] - bl[0]) ** 2) + ((tl[1] - bl[1]) ** 2))
-	maxHeight = max(int(heightA), int(heightB))
-	
-	# now that we have the dimensions of the new image, construct
-	# the set of destination points to obtain a "birds eye view",
-	# (i.e. top-down view) of the image, again specifying points
-	# in the top-left, top-right, bottom-right, and bottom-left
-	# order
-	dst = np.array([
-		[0, 0],
-		[maxWidth - 1, 0],
-		[maxWidth - 1, maxHeight - 1],
-		[0, maxHeight - 1]], dtype = "float32")
-	
-	# compute the perspective transform matrix and then apply it
-	M = cv2.getPerspectiveTransform(rect, dst)
-	warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
-	
-	# return the warped image
-	return warped
 			
 # Obtain an image of the blank paper and determine our critical points and our perspective matrix
 def initPerspective():
@@ -200,16 +166,20 @@ def initPerspective():
 	img = cv2.imread(pics[0][0])
 	gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 	corners = cv2.goodFeaturesToTrack(gray,4,0.01,10)
-	corners = np.int0(corners)
-	pts = [list(corners[i][0]) for i in range(0,4)]
-	pts = np.array(pts,"float32")
-	perspective_pts = order_points(pts)
-	print perspective_pts
+	corners = np.float32([corners[0][0],corners[1][0],corners[2][0],corners[3][0]])
+	perspective_pts = order_points(corners)
+	rows,cols = img.shape[:2]
+	dst = np.array([
+		[0, 0],
+		[cols - 1, 0],
+		[cols - 1, rows - 1],
+		[0, rows - 1]], dtype = "float32")
+	perspective_mat = cv2.getPerspectiveTransform(corners,dst)
 	
 			
-#TODO: jasdklfjsadlk
+# Apply perspective correction
 def perspectiveCorrection(frame):
-	return four_point_transform(frame,perspective_pts)
+	return cvw.warpPerspective(image,perspective_mat,(rows,cols))
 			
 # TODO: Write this function
 # This function verifies that the blocks on the board match the blockList. Returns either True or False, with True being a match
