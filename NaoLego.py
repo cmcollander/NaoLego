@@ -25,9 +25,16 @@ IP = "127.0.0.1" # IP Address of the Nao. Since this is run from the Nao, this i
 tts = ALProxy("ALTextToSpeech",IP,9559) # Handles speech from the Nao
 motion = ALProxy("ALMotion","127.0.0.1",9559) # Handles joint movements for the Nao
 posture = ALProxy("ALRobotPosture","127.0.0.1",9559) # Handles postures of the robot
+camera = ALProxy("ALPhotoCapture","127.0.0.1",9559) # Handles the camera of the robot
 Finished = False
 
 blockList = [] # Represents a list of LegoBlocks. Is initialized as empty
+
+# Initializes the camera settings
+def initCamera():
+	camera.setResolution(2)
+	camera.setPictureFormat("jpg")
+	camera.setCameraID(1)
 
 # Starts a webserver to display index.html. Is run in a separate thread
 def webServerThread():
@@ -155,7 +162,10 @@ def verifyBlocks():
 
 # First thing, start our webserver
 sendInitScreen()
-thread.start_new_thread(webServerThread,())	
+thread.start_new_thread(webServerThread,())
+
+# Prepare our camera
+initCamera()
 
 # Get the NAO in the correct position
 posture.goToPosture("StandInit",1.0)
