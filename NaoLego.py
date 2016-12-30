@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-# TODO: Write functions sendBlockList, verifyBlocks
+# TODO: Write function verifyBlocks
 # TODO: Obtain data such as time to add block, number of incorrect blocks, and individual error counters for wrong coordinates, wrong color, wrong size, etc.
 # TODO: At the end of the program, save the obtained data to a CSV file for future processing.
 
@@ -150,7 +150,8 @@ def sendBlockList():
 	nubW = xUnit - xUnit / 2 # nub width
 	nubH = yUnit - yUnit / 2 # nub height
 	nubXOff = nubW / 2 # nub x-axis offset for where to begin drawing nub
-	img = np.full((imH,imW,3), 255, dtype=np.uint8)
+	img = np.zeros((imH,imW,3),dtype=np.uint8)
+	img.fill(255)
 
 	for block in blockList:
 		y = (block.y * yUnit) + yOff
@@ -165,6 +166,7 @@ def sendBlockList():
 
 	res = cv2.flip(img,0)
 	cv2.imwrite('image.jpg', res)
+
 
 def sendCVBlockList():
 	imW = 640 # image width
