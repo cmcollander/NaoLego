@@ -166,6 +166,39 @@ def sendBlockList():
 	res = cv2.flip(img,0)
 	cv2.imwrite('image.jpg', res)
 
+def sendCVBlockList():
+	imW = 640 # image width
+	imH = 480 # image height
+	xUnit = imW / 20 # one Lego block unit in width
+	yUnit = int(xUnit * 0.6) # one Lego block unit in height
+	yUnitPlus = int(yUnit * 0.66)
+	xOff = (imW / 2) - ((imW / xUnit) * 8) # offset along x-axis for where to begin drawing blocks
+	yOff = (imH / 2) - ((imH / yUnit) * 3) # offset along y-axis for where to begin drawing blocks
+	nubW = int(xUnit * 0.75) # nub width
+	nubH = int(yUnit * 1.6667) # nub height
+	nubXOff = int(nubW - (nubW * 0.8125) ) # nub x-axis offset for where to begin drawing nub
+	img = np.zeros((imH, imW, 3), dtype=np.uint8)
+	img.fill(255)
+
+	for block in blockList:
+		y = (block.y * yUnit) + yOff
+		for x in range(block.x, block.x + block.width):
+			# Draw shadowed perspective
+			curX = (x * xUnit) + xOff
+			top_L = (curX, y)
+			bot_R = (top_L[0]+xUnit-1, top_L[1]+yUnit+yUnitPlus-1)
+			cv2.rectangle(img, top_L, bot_R, tuple([0.6*x for x in block.color]), -1)
+			# Draw block
+			bot_R = (top_L[0]+xUnit-1, top_L[1]+yUnit-1)
+			cv2.rectangle(img, top_L, bot_R, block.color, -1)
+			# Draw nub
+			top_L = (curX+nubXOff, bot_R[1])
+			bot_R = (top_L[0]+nubW, top_L[1]+nubH)
+			cv2.rectangle(img, top_L, bot_R, block.color, -1)
+
+	res = cv2.flip(img,0)
+	cv2.imwrite('cvblocklist.jpg', res)
+
 for i in range(5):
 	addBlock()
 	sendBlockList()
