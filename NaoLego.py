@@ -1,7 +1,6 @@
 #! /usr/bin/python
 
-# TODO: Write functions sendBlockList, waitForHeadTouch, verifyBlocks
-# TODO: Pull blocks for AddBlock from a list of blocks that we actually have
+# TODO: Write functions sendBlockList, verifyBlocks
 # TODO: Obtain data such as time to add block, number of incorrect blocks, and individual error counters for wrong coordinates, wrong color, wrong size, etc.
 # TODO: At the end of the program, save the obtained data to a CSV file for future processing.
 
@@ -91,6 +90,7 @@ def webServerThread():
 # Places a new block at a new layer on top of all previous blocks. Ensure the block does connect through at least one lego peg to the layer beneath it.
 # If the new block's x coord is less than 0, shift all blocks to the right until the block's x coord is 0.
 # The first layer is y coord 0, second is y coord 1, etc. Keep in mind that a 'standard' block is a height of 2 layers
+# Will not place a new block of the same color as the previous block, to improve CV recognition
 def addBlock():
 	# Find the current layer
 	layer = 0
@@ -138,8 +138,6 @@ def addBlock():
 	for block in blockList:
 		block.x = block.x + offset
 
-# TODO: Improve this function with nubs indicating connectors
-# TODO: After image creation, add to a 640x480 image without distorting image for easier web display
 # Creates an image of the blockList and sends it out to a web server
 # No returns, No parameters, No variable modifications, Modifies the image file for the web server (image.jpg)
 def sendBlockList():
@@ -172,12 +170,12 @@ def sendFinScreen():
 	copyfile('resources/fin_screen.jpg','image.jpg')
 
 # Tells the NAO to say a message. Takes the message as a string parameters. No returns or modifications
+# Moves his head to look at the user while talking
 def NaoSay(s):
 	motion.setAngles("HeadPitch",0,0.1) # Look at the user
 	tts.say(s) # Say our message
 	motion.setAngles("HeadPitch",HEADANGLE,0.1) # Return to board
 
-# TODO: Write this function
 # The nao will prompt the user and wait until his head receives contact
 def waitForHeadTouch():
 	global HeadTouch
