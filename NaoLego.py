@@ -1,12 +1,13 @@
 #! /usr/bin/python
 
-# TODO: Write functions sendBlockList, waitForHeadTouch, verifyBlocks
-# TODO: Pull blocks for AddBlock from a list of blocks that we actually have
+# TODO: Write functions sendBlockList, verifyBlocks
 # TODO: Obtain data such as time to add block, number of incorrect blocks, and individual error counters for wrong coordinates, wrong color, wrong size, etc.
 # TODO: At the end of the program, save the obtained data to a CSV file for future processing.
 
 from LegoBlock import LegoBlock
 from naoqi import ALProxy
+from naoqi import ALBroker
+from HeadTouch import HeadTouch
 import SimpleHTTPServer
 import SocketServer
 import os
@@ -16,6 +17,7 @@ import thread
 import random
 import numpy as np
 import cv2
+import sys
 
 SERVERPORT = 8080 # What port number with the hosted webserver be run on?
 NUMBLOCKS = 5 # Represents the number of blocks we will assemble
@@ -25,6 +27,8 @@ motion = ALProxy("ALMotion","127.0.0.1",9559) # Handles joint movements for the 
 posture = ALProxy("ALRobotPosture","127.0.0.1",9559) # Handles postures of the robot
 camera = ALProxy("ALPhotoCapture","127.0.0.1",9559) # Handles the camera of the robot
 audio = ALProxy("ALAudioPlayer","127.0.0.1",9559) # Handles sound output
+myBroker = ALBroker("myBroker","0.0.0.0",0,"127.0.0.1",9559)
+HeadTouch = HeadTouch("HeadTouch")
 Finished = False
 perspective_mat = None # Holds the transformation matrix for the visual perspective
 HEADANGLE = 0.28 # Calibrated so he does not see his feet
@@ -86,18 +90,30 @@ def webServerThread():
 # Places a new block at a new layer on top of all previous blocks. Ensure the block does connect through at least one lego peg to the layer beneath it.
 # If the new block's x coord is less than 0, shift all blocks to the right until the block's x coord is 0.
 # The first layer is y coord 0, second is y coord 1, etc. Keep in mind that a 'standard' block is a height of 2 layers
+# Will not place a new block of the same color as the previous block, to improve CV recognition
 def addBlock():
 	# Find the current layer
 	layer = 0
 	for block in blockList:
 		layer += block.getHeight() # Increase Layer by the height of the block
-	newBlock = presentBlockList.pop() # Get a new block from our presentBlockList
-	height = newBlock.getHeight()
-	width = newBlock.getWidth()
+	width = 0
+	height = 0
+
 
 	if layer==0:
+		newBlock = presentBlockList.pop() # Get a new block from our presentBlockList
+		height = newBlock.getHeight()
+		width = newBlock.getWidth()
 		newBlock.setCoords(0,0) # Our first block is placed at the origin
 	else: # If this is not our first block...
+		prevcolor = blockList[-1].getColor()
+		nextcolor = presentBlockList[-1].getColor()
+		while prevcolor==nextcolor:
+			random.shuffle(presentBlockList)
+			nextcolor = presentBlockList[-1].getColor()
+		newBlock = presentBlockList.pop()
+		height = newBlock.getHeight()
+		width = newBlock.getWidth()
 		below = blockList[-1] # Obtain the block on the below layer, which should be the last placed in the list
 		left = below.x-(width-1) # Obtain our leftmost possible location
 		right = below.width+below.x - 1 # Obtain our rightmost possible location
@@ -122,8 +138,6 @@ def addBlock():
 	for block in blockList:
 		block.x = block.x + offset
 
-# TODO: Improve this function with nubs indicating connectors
-# TODO: After image creation, add to a 640x480 image without distorting image for easier web display
 # Creates an image of the blockList and sends it out to a web server
 # No returns, No parameters, No variable modifications, Modifies the image file for the web server (image.jpg)
 def sendBlockList():
@@ -176,16 +190,19 @@ def sendFinScreen():
 	copyfile('resources/fin_screen.jpg','image.jpg')
 
 # Tells the NAO to say a message. Takes the message as a string parameters. No returns or modifications
+# Moves his head to look at the user while talking
 def NaoSay(s):
 	motion.setAngles("HeadPitch",0,0.1) # Look at the user
 	tts.say(s) # Say our message
 	motion.setAngles("HeadPitch",HEADANGLE,0.1) # Return to board
 
-# TODO: Write this function
 # The nao will prompt the user and wait until his head receives contact
 def waitForHeadTouch():
+	global HeadTouch
 	tts.say("Please touch my head when you are ready.")
-	time.sleep(5)
+	HeadTouch.resetTouched();
+	while not HeadTouch.isTouched():
+		time.sleep(0.25)
 	playAudio("/home/nao/NaoLego/resources/ack.wav") # Play an audio file to acknowledge the head touch
 
 # Ensure that for our perspective we have a consistent ordering of points
@@ -200,6 +217,16 @@ def order_points(pts):
 	rect[3] = pts[np.argmax(diff)]
 	return rect
 
+# Verify that our perspective points are correct, as best we can
+def verifyPerspectivePoints(pts):
+	# Convert points from lists to tuples
+	pts_tuples = [(v[0],v[1]) for v in pts.tolist()]
+	# Ensure we do not have any duplicate points
+	if not len(set(pts_tuples))==len(pts_tuples):
+		return False
+	# Can implement more verifications here in the future
+	return True
+
 # Obtain an image of the blank paper and determine our critical points and our perspective matrix
 def initPerspective():
 	global perspective_mat
@@ -209,6 +236,8 @@ def initPerspective():
 	corners = cv2.goodFeaturesToTrack(gray,4,0.01,10)
 	corners = np.float32([corners[0][0],corners[1][0],corners[2][0],corners[3][0]])
 	perspective_pts = order_points(corners)
+	if not verifyPerspectivePoints(perspective_pts):
+		print "ERROR! MAY BE INVALID PERSPECTIVE POINTS!"
 	dst = np.array([
 		[0, 0],
 		[639, 0],
@@ -235,6 +264,9 @@ def perspectiveCorrection(frame):
 def verifyBlocks():
 	pic = camera.takePicture("/home/nao/NaoLego/","frame")
 	img = perspectiveCorrection(cv2.imread(pic[0])) # Apply perspective correction to our image
+	# Flip the picture to an orientation matching our generated image
+	img = cv2.flip(img,1)
+	img = cv2.flip(img,0)
 	cv2.imwrite("frameP.jpg",img) # Save our new perspectivized image to frameP.jpg
 	# TODO: Analyze image here
 	return True
@@ -283,3 +315,5 @@ sendFinScreen()
 Finished = True
 playAudio("/home/nao/NaoLego/resources/clap.wav")
 NaoSay("Great job! I hope you enjoyed this exercise! Come play again soon!")
+myBroker.shutdown()
+sys.exit(0)
