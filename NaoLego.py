@@ -204,7 +204,7 @@ def verifyPerspectivePoints(pts):
 	# Convert points from lists to tuples
 	pts_tuples = [(v[0],v[1]) for v in pts.tolist()]
 	# Ensure we do not have any duplicate points
-	if not len(set(pts_tuples)))==len(pts_tuples):
+	if not len(set(pts_tuples))==len(pts_tuples):
 		return False
 	# Can implement more verifications here in the future
 	return True
