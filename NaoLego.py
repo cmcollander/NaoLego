@@ -7,6 +7,7 @@
 
 from LegoBlock import LegoBlock
 from naoqi import ALProxy
+from HeadTouch import HeadTouch
 import SimpleHTTPServer
 import SocketServer
 import os
@@ -25,6 +26,8 @@ motion = ALProxy("ALMotion","127.0.0.1",9559) # Handles joint movements for the 
 posture = ALProxy("ALRobotPosture","127.0.0.1",9559) # Handles postures of the robot
 camera = ALProxy("ALPhotoCapture","127.0.0.1",9559) # Handles the camera of the robot
 audio = ALProxy("ALAudioPlayer","127.0.0.1",9559) # Handles sound output
+myBroker = ALBroker("myBroker","0.0.0.0",0,"127.0.0.1",9559)
+HeadTouch = HeadTouch("HeadTouch")
 Finished = False
 perspective_mat = None # Holds the transformation matrix for the visual perspective
 HEADANGLE = 0.28 # Calibrated so he does not see his feet
@@ -164,8 +167,11 @@ def NaoSay(s):
 # TODO: Write this function
 # The nao will prompt the user and wait until his head receives contact
 def waitForHeadTouch():
+	global HeadTouch
 	tts.say("Please touch my head when you are ready.")
-	time.sleep(5)
+	HeadTouch.resetTouched();
+	while not HeadTouch.isTouched(self):
+		time.sleep(0.25)
 	playAudio("/home/nao/NaoLego/resources/ack.wav") # Play an audio file to acknowledge the head touch
 
 # Ensure that for our perspective we have a consistent ordering of points
@@ -263,3 +269,5 @@ sendFinScreen()
 Finished = True
 playAudio("/home/nao/NaoLego/resources/clap.wav")
 NaoSay("Great job! I hope you enjoyed this exercise! Come play again soon!")
+myBroker.shutdown()
+sys.exit(0)
