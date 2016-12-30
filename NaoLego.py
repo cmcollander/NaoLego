@@ -99,6 +99,9 @@ def addBlock():
 	width = 0
 	height = 0
 	if layer==0:
+		# Ensure that our first block is 4 long
+		while presentBlockList[-1].getWidth()==2:
+			random.shuffle(presentBlockList)
 		newBlock = presentBlockList.pop() # Get a new block from our presentBlockList
 		height = newBlock.getHeight()
 		width = newBlock.getWidth()
