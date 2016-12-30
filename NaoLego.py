@@ -7,6 +7,7 @@
 
 from LegoBlock import LegoBlock
 from naoqi import ALProxy
+from naoqi import ALBroker
 from HeadTouch import HeadTouch
 import SimpleHTTPServer
 import SocketServer
@@ -170,7 +171,7 @@ def waitForHeadTouch():
 	global HeadTouch
 	tts.say("Please touch my head when you are ready.")
 	HeadTouch.resetTouched();
-	while not HeadTouch.isTouched(self):
+	while not HeadTouch.isTouched():
 		time.sleep(0.25)
 	playAudio("/home/nao/NaoLego/resources/ack.wav") # Play an audio file to acknowledge the head touch
 
