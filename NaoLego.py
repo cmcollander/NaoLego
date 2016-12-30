@@ -66,7 +66,7 @@ def initCamera():
 	camera.setResolution(2)
 	camera.setPictureFormat("jpg")
 	camera.setCameraID(1)
-	
+
 # Plays the audio file given as a parameter
 def playAudio(file):
 	fileID = audio.loadFile(file)
@@ -103,7 +103,7 @@ def addBlock():
 		right = below.width+below.x - 1 # Obtain our rightmost possible location
 		newBlock.setCoords(random.randrange(left,right+1),layer) # The X coordinate is determined from Left and Right, The Y coordinate is the current layer
 	blockList.append(newBlock) # Place our new block into our blockList
-	
+
 	# Find the block in the layer beneath and set any connected connectors to 1
 	if len(blockList)>=2:
 		thisBlockXList = range(newBlock.x,newBlock.x+newBlock.width)
@@ -113,7 +113,7 @@ def addBlock():
 		subVal = inter[0]
 		inter[:] = [x - subVal for x in inter]
 		prevBlock.setBits(inter)
-	
+
 	# Shift all blocks to the right so they are all nonnegative coordinates
 	v = []
 	for block in blockList:
@@ -127,17 +127,37 @@ def addBlock():
 # Creates an image of the blockList and sends it out to a web server
 # No returns, No parameters, No variable modifications, Modifies the image file for the web server (image.jpg)
 def sendBlockList():
-	img = np.zeros((5,16,3), np.uint8)
-	for x in range(16):
-		for y in range(5):
-			img[y,x] = (255,255,255)
+	imW = 640 # image width
+	imH = 480 # image height
+	xUnit = imW / 20 # one Lego block unit in width
+	yUnit = imH / 15 # one Lego block unit in height
+	xOff = (imW / 2) - ((imW / xUnit) * 8) # offset along x-axis for where to begin drawing blocks
+	yOff = (imH / 2) - ((imH / yUnit) * 3) # offset along y-axis for where to begin drawing blocks
+	nubW = xUnit - xUnit / 2 # nub width
+	nubH = yUnit - yUnit / 2 # nub height
+	nubXOff = nubW / 2 # nub x-axis offset for where to begin drawing nub
+	img = np.full((imH,imW,3), 255, dtype=np.uint8)
+
 	for block in blockList:
-		y = block.y
-		for x in range(block.x,block.x+block.width):
-			img[y,x] = block.color
-	res = cv2.resize(img, None, fx=60, fy=60, interpolation=cv2.INTER_NEAREST)
-	res = cv2.flip(res,0)
+		y = (block.y * yUnit) + yOff
+		for x in range(block.x, block.x + block.width):
+			curX = (x * xUnit) + xOff
+			top_L = (curX, y)
+			bot_R = (top_L[0]+xUnit-1, top_L[1]+yUnit-1)
+			cv2.rectangle(img, top_L, bot_R, block.color, -1)
+			top_L = (top_L[0]+nubXOff, bot_R[1])
+			bot_R = (top_L[0]+nubW, top_L[1]+nubH)
+			cv2.rectangle(img, top_L, bot_R, block.color, -1)
+
+	res = cv2.flip(img,0)
 	cv2.imwrite('image.jpg', res)
+
+for i in range(5):
+	addBlock()
+	sendBlockList()
+	img = cv2.imread('image.jpg', cv2.IMREAD_UNCHANGED)
+	cv2.imshow('image', img)
+	cv2.waitKey()
 
 # Sends a default image for the introduction of the application
 # No returns, no parameters, no varaible modifications, Modifies the image file for the web server (image.jpg)
@@ -179,7 +199,7 @@ def order_points(pts):
 	rect[1] = pts[np.argmin(diff)]
 	rect[3] = pts[np.argmax(diff)]
 	return rect
-			
+
 # Obtain an image of the blank paper and determine our critical points and our perspective matrix
 def initPerspective():
 	global perspective_mat
@@ -203,12 +223,12 @@ def initPerspective():
 	cv2.circle(p_img,(int(p_list[2][0]),int(p_list[2][1])),10,(0,0,255),-1)
 	cv2.circle(p_img,(int(p_list[3][0]),int(p_list[3][1])),10,(0,0,0),-1)
 	cv2.imwrite("perspective.jpg",p_img)
-	
-			
+
+
 # Apply perspective correction
 def perspectiveCorrection(frame):
 	return cv2.warpPerspective(frame,perspective_mat,(640,480))
-			
+
 # TODO: Write this function
 # This function verifies that the blocks on the board match the blockList. Returns either True or False, with True being a match
 # No parameters, No modifications
@@ -230,7 +250,7 @@ initCamera()
 
 # Get the NAO in the correct position
 posture.goToPosture("StandInit",1.0)
-			
+
 NaoSay("Hello! Thank you for playing my Lego Assembly game. First, please ensure that the board in front of me is clear and you have logged into my webserver. My server address is 192.168.1.12 port 8 0 8 0.")
 waitForHeadTouch()
 
