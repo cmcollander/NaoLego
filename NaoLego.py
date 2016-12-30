@@ -108,7 +108,7 @@ def addBlock():
 	else: # If this is not our first block...
 		prevcolor = blockList[-1].getColor()
 		nextcolor = presentBlockList[-1].getColor()
-		while not prevcolor==nextcolor:
+		while prevcolor==nextcolor:
 			random.shuffle(presentBlockList)
 			nextcolor = presentBlockList[-1].getColor()
 		newBlock = presentBlockList.pop()
