@@ -244,6 +244,9 @@ def perspectiveCorrection(frame):
 def verifyBlocks():
 	pic = camera.takePicture("/home/nao/NaoLego/","frame")
 	img = perspectiveCorrection(cv2.imread(pic[0])) # Apply perspective correction to our image
+	# Flip the picture to an orientation matching our generated image
+	img = cv2.flip(img,1)
+	img = cv2.flip(img,0)
 	cv2.imwrite("frameP.jpg",img) # Save our new perspectivized image to frameP.jpg
 	# TODO: Analyze image here
 	return True
