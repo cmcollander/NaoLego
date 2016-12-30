@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-# TODO: Write functions sendBlockList, verifyBlocks
+# TODO: Write function verifyBlocks
 # TODO: Obtain data such as time to add block, number of incorrect blocks, and individual error counters for wrong coordinates, wrong color, wrong size, etc.
 # TODO: At the end of the program, save the obtained data to a CSV file for future processing.
 
