@@ -12,7 +12,7 @@ class HeadTouch(ALModule):
 		memory.subscribeToEvent("TouchChanged","HeadTouch","onTouched")
 
 	def onTouched(self,strVarName,value):
-		memory.unsubscribeToEvent("TouchChanged","ReactToTouch")
+		memory.unsubscribeToEvent("TouchChanged","HeadTouch")
 
 		touched_bodies = []
 		for p in value:
@@ -23,7 +23,7 @@ class HeadTouch(ALModule):
 			if body[:4]=='Head':
 				self.touched = True
 
-		memory.subscribeToEvent("TouchChanged","ReactToTouch","onTouched")
+		memory.subscribeToEvent("TouchChanged","HeadTouch","onTouched")
 
 	def isTouched(self):
 		return self.touched
