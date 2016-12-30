@@ -150,7 +150,10 @@ def sendBlockList():
 	nubW = xUnit - xUnit / 2 # nub width
 	nubH = yUnit - yUnit / 2 # nub height
 	nubXOff = nubW / 2 # nub x-axis offset for where to begin drawing nub
-	img = np.full((imH,imW,3), 255, dtype=np.uint8)
+	img = np.zeros((imH,imW,3),dtype=np.uint8)
+	for y in range(imH):
+		for x in range(imW):
+			img[y,x] = [255,255,255]
 
 	for block in blockList:
 		y = (block.y * yUnit) + yOff
