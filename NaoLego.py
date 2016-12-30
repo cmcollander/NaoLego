@@ -96,14 +96,14 @@ def addBlock():
 	layer = 0
 	for block in blockList:
 		layer += block.getHeight() # Increase Layer by the height of the block
-	nextColor = presentBlockList[-1].getColor()
-	prevColor = blockList[
-	newBlock = presentBlockList.pop() # Get a new block from our presentBlockList
-	height = newBlock.getHeight()
-	width = newBlock.getWidth()
+	width = 0
+	height = 0
+	
 
 	if layer==0:
 		newBlock = presentBlockList.pop() # Get a new block from our presentBlockList
+		height = newBlock.getHeight()
+		width = newBlock.getWidth()
 		newBlock.setCoords(0,0) # Our first block is placed at the origin
 	else: # If this is not our first block...
 		prevcolor = blockList[-1].getColor()
@@ -112,6 +112,8 @@ def addBlock():
 			random.shuffle(presentBlockList)
 			nextcolor = presentBlockList[-1].getColor()
 		newBlock = presentBlockList.pop()
+		height = newBlock.getHeight()
+		width = newBlock.getWidth()
 		below = blockList[-1] # Obtain the block on the below layer, which should be the last placed in the list
 		left = below.x-(width-1) # Obtain our leftmost possible location
 		right = below.width+below.x - 1 # Obtain our rightmost possible location
