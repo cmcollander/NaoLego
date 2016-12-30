@@ -24,6 +24,7 @@ tts = ALProxy("ALTextToSpeech",IP,9559) # Handles speech from the Nao
 motion = ALProxy("ALMotion","127.0.0.1",9559) # Handles joint movements for the Nao
 posture = ALProxy("ALRobotPosture","127.0.0.1",9559) # Handles postures of the robot
 camera = ALProxy("ALPhotoCapture","127.0.0.1",9559) # Handles the camera of the robot
+audio = ALProxy("ALAudioPlayer","127.0.0.1",9559) # Handles sound output
 Finished = False
 perspective_mat = None # Holds the transformation matrix for the visual perspective
 HEADANGLE = 0.28 # Calibrated so he does not see his feet
@@ -65,6 +66,11 @@ def initCamera():
 	camera.setResolution(2)
 	camera.setPictureFormat("jpg")
 	camera.setCameraID(1)
+	
+# Plays the audio file given as a parameter
+def playAudio(file):
+	fileID = audio.loadFile(file)
+	audio.play(fileID)
 
 # Starts a webserver to display index.html. Is run in a separate thread
 def webServerThread():
@@ -160,6 +166,7 @@ def NaoSay(s):
 def waitForHeadTouch():
 	tts.say("Please touch my head when you are ready.")
 	time.sleep(5)
+	playAudio("/home/nao/NaoLego/resources/ack.wav") # Play an audio file to acknowledge the head touch
 
 # Ensure that for our perspective we have a consistent ordering of points
 # http://www.pyimagesearch.com/2014/08/25/4-point-opencv-getperspective-transform-example/
@@ -230,7 +237,8 @@ waitForHeadTouch()
 # Determine the points of our paper and our perspective
 motion.setAngles("HeadPitch",HEADANGLE,0.1)
 time.sleep(1) # Allow time for our head to reach the correct location before obtaining points
-initPerspective()
+initPerspective() # Find our perspective transformation
+verifyBlocks() # Go ahead and obtain an image from the camera so we aren't looking at a previous picture
 
 # First block
 addBlock()
@@ -253,4 +261,5 @@ for lcv in range(NUMBLOCKS-1): # -1 since we already placed 1 block
 
 sendFinScreen()
 Finished = True
+playAudio("/home/nao/NaoLego/resources/clap.wav")
 NaoSay("Great job! I hope you enjoyed this exercise! Come play again soon!")
