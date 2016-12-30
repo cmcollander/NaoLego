@@ -18,6 +18,7 @@ import thread
 import random
 import numpy as np
 import cv2
+import sys
 
 SERVERPORT = 8080 # What port number with the hosted webserver be run on?
 NUMBLOCKS = 5 # Represents the number of blocks we will assemble
@@ -186,7 +187,17 @@ def order_points(pts):
 	rect[1] = pts[np.argmin(diff)]
 	rect[3] = pts[np.argmax(diff)]
 	return rect
-			
+
+# Verify that our perspective points are correct, as best we can
+def verifyPerspectivePoints(pts):
+	# Convert points from lists to tuples
+	pts_tuples = [(v[0],v[1]) for v in pts]
+	# Ensure we do not have any duplicate points
+	if not list(set(pts_tuples))==pts_tuples:
+		return False
+	# Can implement more verifications here in the future
+	return True
+
 # Obtain an image of the blank paper and determine our critical points and our perspective matrix
 def initPerspective():
 	global perspective_mat
@@ -196,6 +207,8 @@ def initPerspective():
 	corners = cv2.goodFeaturesToTrack(gray,4,0.01,10)
 	corners = np.float32([corners[0][0],corners[1][0],corners[2][0],corners[3][0]])
 	perspective_pts = order_points(corners)
+	if not verifyPerspectivePoints(perspective_pts):
+		print "ERROR! MAY BE INVALID PERSPECTIVE POINTS!"
 	dst = np.array([
 		[0, 0],
 		[639, 0],
