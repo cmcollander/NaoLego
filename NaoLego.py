@@ -109,7 +109,7 @@ def addBlock():
 	else: # If this is not our first block...
 		prevcolor = blockList[-1].getColor()
 		nextcolor = presentBlockList[-1].getColor()
-		while prevcolor==nextcolor:
+		while prevcolor==nextcolor or (layer==1 and presentBlockList[-1].getWidth()==4):
 			random.shuffle(presentBlockList)
 			nextcolor = presentBlockList[-1].getColor()
 		newBlock = presentBlockList.pop()
@@ -118,7 +118,10 @@ def addBlock():
 		below = blockList[-1] # Obtain the block on the below layer, which should be the last placed in the list
 		left = below.x-(width-1) # Obtain our leftmost possible location
 		right = below.width+below.x - 1 # Obtain our rightmost possible location
-		newBlock.setCoords(random.randrange(left,right+1),layer) # The X coordinate is determined from Left and Right, The Y coordinate is the current layer
+		newx = random.randrange(left,right+1)
+		if layer==1:
+			newx = random.randrange(0,3)
+		newBlock.setCoords(newx,layer) # The X coordinate is determined from Left and Right, The Y coordinate is the current layer
 	blockList.append(newBlock) # Place our new block into our blockList
 
 	# Find the block in the layer beneath and set any connected connectors to 1
