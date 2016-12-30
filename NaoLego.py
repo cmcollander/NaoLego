@@ -169,13 +169,6 @@ def sendBlockList():
 	res = cv2.flip(img,0)
 	cv2.imwrite('image.jpg', res)
 
-for i in range(5):
-	addBlock()
-	sendBlockList()
-	img = cv2.imread('image.jpg', cv2.IMREAD_UNCHANGED)
-	cv2.imshow('image', img)
-	cv2.waitKey()
-
 # Sends a default image for the introduction of the application
 # No returns, no parameters, no varaible modifications, Modifies the image file for the web server (image.jpg)
 # Just need to remove image.jpg and copy resources/init_screen.jpg to image.jpg.
