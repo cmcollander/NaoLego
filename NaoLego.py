@@ -35,19 +35,19 @@ HEADANGLE = 0.28 # Calibrated so he does not see his feet
 
 # What lego blocks do we have?
 presentBlockList = [] # Represents the list of LegoBlocks we actually have
-red4x1 = LegoBlock(4,1,(0,0,255),0,0)
-green4x1 = LegoBlock(4,1,(0,255,0),0,0)
-blue4x1a = LegoBlock(4,1,(255,0,0),0,0)
-blue4x1b = LegoBlock(4,1,(255,0,0),0,0)
-blue4x1c = LegoBlock(4,1,(255,0,0),0,0)
-blue4x1d = LegoBlock(4,1,(255,0,0),0,0)
-red2x1a = LegoBlock(2,1,(0,0,255),0,0)
-red2x1b = LegoBlock(2,1,(0,0,255),0,0)
-green2x1a = LegoBlock(2,1,(0,255,0),0,0)
-green2x1b = LegoBlock(2,1,(0,255,0),0,0)
-green2x1c = LegoBlock(2,1,(0,255,0),0,0)
-blue2x1a = LegoBlock(2,1,(255,0,0),0,0)
-blue2x1b = LegoBlock(2,1,(255,0,0),0,0)
+red4x1 = LegoBlock(4,1,(0,0,200),0,0)
+green4x1 = LegoBlock(4,1,(0,180,0),0,0)
+blue4x1a = LegoBlock(4,1,(220,110,0),0,0)
+blue4x1b = LegoBlock(4,1,(220,110,0),0,0)
+blue4x1c = LegoBlock(4,1,(220,110,0),0,0)
+blue4x1d = LegoBlock(4,1,(220,110,0),0,0)
+red2x1a = LegoBlock(2,1,(0,0,200),0,0)
+red2x1b = LegoBlock(2,1,(0,0,200),0,0)
+green2x1a = LegoBlock(2,1,(0,180,0),0,0)
+green2x1b = LegoBlock(2,1,(0,180,0),0,0)
+green2x1c = LegoBlock(2,1,(0,180,0),0,0)
+blue2x1a = LegoBlock(2,1,(220,110,0),0,0)
+blue2x1b = LegoBlock(2,1,(220,110,0),0,0)
 presentBlockList.append(red4x1)
 presentBlockList.append(green4x1)
 presentBlockList.append(blue4x1a)
@@ -98,8 +98,6 @@ def addBlock():
 		layer += block.getHeight() # Increase Layer by the height of the block
 	width = 0
 	height = 0
-
-
 	if layer==0:
 		newBlock = presentBlockList.pop() # Get a new block from our presentBlockList
 		height = newBlock.getHeight()
@@ -152,7 +150,6 @@ def sendBlockList():
 	nubXOff = nubW / 2 # nub x-axis offset for where to begin drawing nub
 	img = np.zeros((imH,imW,3),dtype=np.uint8)
 	img.fill(255)
-
 	for block in blockList:
 		y = (block.y * yUnit) + yOff
 		for x in range(block.x, block.x + block.width):
@@ -163,7 +160,6 @@ def sendBlockList():
 			top_L = (top_L[0]+nubXOff, bot_R[1])
 			bot_R = (top_L[0]+nubW, top_L[1]+nubH)
 			cv2.rectangle(img, top_L, bot_R, block.color, -1)
-
 	res = cv2.flip(img,0)
 	cv2.imwrite('image.jpg', res)
 
@@ -181,7 +177,6 @@ def sendCVBlockList():
 	nubXOff = int(nubW - (nubW * 0.8125) ) # nub x-axis offset for where to begin drawing nub
 	img = np.zeros((imH, imW, 3), dtype=np.uint8)
 	img.fill(255)
-
 	for block in blockList:
 		y = (block.y * yUnit) + yOff
 		for x in range(block.x, block.x + block.width):
@@ -197,16 +192,8 @@ def sendCVBlockList():
 			top_L = (curX+nubXOff, bot_R[1])
 			bot_R = (top_L[0]+nubW, top_L[1]+nubH)
 			cv2.rectangle(img, top_L, bot_R, block.color, -1)
-
 	res = cv2.flip(img,0)
 	cv2.imwrite('cvblocklist.jpg', res)
-
-for i in range(5):
-	addBlock()
-	sendBlockList()
-	img = cv2.imread('image.jpg', cv2.IMREAD_UNCHANGED)
-	cv2.imshow('image', img)
-	cv2.waitKey()
 
 # Sends a default image for the introduction of the application
 # No returns, no parameters, no varaible modifications, Modifies the image file for the web server (image.jpg)
