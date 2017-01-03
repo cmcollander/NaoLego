@@ -109,7 +109,7 @@ def addBlock():
 	else: # If this is not our first block...
 		prevcolor = blockList[-1].getColor()
 		nextcolor = presentBlockList[-1].getColor()
-		while prevcolor==nextcolor or (layer==1 and presentBlockList[-1].getWidth()==4):
+		while prevcolor==nextcolor or (layer==1 and presentBlockList[-1].getWidth()==4) or (layer>1 and presentBlockList[-2].getColor()==nextColor):
 			random.shuffle(presentBlockList)
 			nextcolor = presentBlockList[-1].getColor()
 		newBlock = presentBlockList.pop()
