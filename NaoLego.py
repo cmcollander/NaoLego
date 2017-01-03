@@ -294,7 +294,7 @@ def getAffineTransform(pt1,pt2,pt3,pt4):
 	pt3x,pt3y = pt3
 	pt4x,pt4y = pt4
 	scale = math.sqrt(((pt4y-pt3y)**2)+((pt4x-pt3x)**2))/(pt2y-pt1y)
-	theta = math.atan((pt4y-pt3y)/(pt4x-pt3x))
+	theta = -1*math.atan((pt4y-pt3y)/(pt4x-pt3x))
 	centerx = pt1x
 	centery = pt1y
 	a = scale*math.cos(theta)
@@ -312,10 +312,11 @@ def verifyBlocks():
 	img = cv2.flip(img,1)
 	img = cv2.flip(img,0)
 	cv2.imwrite("frameP.jpg",img) # Save our new perspectivized image to frameP.jpg
-	sendCVBlockList() # Save our expected image to cvblocklist.jpg
+	l = sendCVBlockList() # Save our expected image to cvblocklist.jpg, return focus points
 	exp_img = cv2.imread("cvblocklist.jpg") # Load our expected image to exp_img variable
 	
 	# Use thresholding to bitmask background away from img
+	cols,rows = (480,640)
 	gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 	thresh_inv = cv2.threshold(gray,0,255,cv2.THRESH_BINARY|cv2.THRESH_OTSU)[1]
 	thresh = cv2.bitwise_not(thresh_inv) # Flip our threshold around
@@ -324,13 +325,15 @@ def verifyBlocks():
 	img = cv2.addWeighted(img,1,cv2.cvtColor(thresh_inv,cv2.COLOR_GRAY2BGR),1,0)
 	
 	# Get pt1 and pt2 from our created image
+	pt1 = l[0]
+	pt2 = l[1]
 	
+	# TODO: Determine bottom two corners of blocks in img (pt3, pt4)
 	
-	# TODO: Determine bottom two corners of blocks in img
-	# Translate/Rotate/Scale to match corners between exp_img and img, adjusting exp_img
-	cols,rows = (480,640)
-	M = getAFfineTransform(pt1,pt2,pt3,pt4)
+	# Rotate/Scale to match corners between exp_img and img, adjusting exp_img
+	M = getAffineTransform(pt1,pt2,pt3,pt4)
 	exp_img = cv2.warpAffine(img,M,(cols,rows))
+	# TODO: Apply translation to match images
 	# TODO: Calculation  between exp_img and img
 	# TODO: If norm<threshold: return True, Else: False
 	
