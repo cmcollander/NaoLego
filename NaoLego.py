@@ -296,7 +296,14 @@ def verifyBlocks():
 	img = cv2.flip(img,1)
 	img = cv2.flip(img,0)
 	cv2.imwrite("frameP.jpg",img) # Save our new perspectivized image to frameP.jpg
-	# TODO: Analyze image here
+	sendCVBlockList() # Save our expected image to cvblocklist.jpg
+	exp_img = cvw.imread("cvblocklist.jpg") # Load our expected image to exp_img variable
+	
+	# TODO: Determine bottom two corners of blocks in img
+	# TODO: Translate/Rotate/Scale to match corners between exp_img and img, adjusting exp_img
+	# TODO: Calculate L1 Norm between exp_img and img
+	# TODO: If norm<threshold: return True, Else: False
+	
 	return True
 
 # -------------- MAIN -------------------------
