@@ -20,7 +20,7 @@ import cv2
 import sys
 import math
 
-NOSAY = True
+NOSAY = False
 SERVERPORT = 8080 # What port number with the hosted webserver be run on?
 NUMBLOCKS = 5 # Represents the number of blocks we will assemble
 IP = "127.0.0.1" # IP Address of the Nao. Since this is run from the Nao, this is localhost
@@ -206,8 +206,8 @@ def sendCVBlockList():
 	# print "x_left = " + str(x_left) + " :: blockList[0].x = " + str(blockList[0].x)
 	y = (blockList[0].y * yUnit) + yOff
 	x_right = xUnit * blockList[0].width + x_left - 1
-	bot_L_pt = (1.0*x_left, 1.0*(imH-y-1))
-	bot_R_pt = (1.0*x_right, 1.0*(imH-y-1))
+	bot_L_pt = (x_left, (imH-y-1))
+	bot_R_pt = (x_right, (imH-y-1))
 
 	str_coords = "["
 	for b in blockList:
@@ -304,6 +304,15 @@ def initPerspective():
 	cv2.circle(p_img,(int(p_list[3][0]),int(p_list[3][1])),10,(0,0,0),-1)
 	cv2.imwrite("perspective.jpg",p_img)
 
+def getOpenConnectorCount():
+	count = 0
+	for block in blockList:
+		bv = block.getbitArray()
+		width = block.getWidth()
+		for b in range(width):
+			count = count + int(not not bv&(1<<b))
+	return count
+			
 
 # Apply perspective correction
 def perspectiveCorrection(frame):
@@ -360,12 +369,13 @@ def verifyBlocks():
 	gray_frame = np.float32(gray_frame)
 	corners = cv2.goodFeaturesToTrack(gray_frame,1000,0.1,10)
 	# Draw corner circles
+	corners2 = []
 	for corner in corners:
 		x,y = corner.ravel()
-		if y>=450:
-			corners.remove(corner)
-		else:
+		if y<450:
+			corners2.append(corner)
 			cv2.circle(img_frame,(x,y),10,255,-1)
+	corners = corners2
 	# Flip corner points x and y for sorting
 	li = []
 	for corner in corners:
@@ -406,8 +416,10 @@ def verifyBlocks():
 	cv2.imwrite("diff.jpg",d)
 
 	NaoSay("The Norm is " + str(int(n))) # Relay the floored norm back to the user
+	
+	threshold = 24000 + 500*getOpenConnectorCount()	
 
-	return True
+	return n<threshold
 
 # -------------- MAIN -------------------------
 
