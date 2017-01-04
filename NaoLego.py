@@ -18,16 +18,17 @@ import random
 import numpy as np
 import cv2
 import sys
+import math
 
 SERVERPORT = 8080 # What port number with the hosted webserver be run on?
 NUMBLOCKS = 5 # Represents the number of blocks we will assemble
 IP = "127.0.0.1" # IP Address of the Nao. Since this is run from the Nao, this is localhost
 tts = ALProxy("ALTextToSpeech",IP,9559) # Handles speech from the Nao
-motion = ALProxy("ALMotion","127.0.0.1",9559) # Handles joint movements for the Nao
-posture = ALProxy("ALRobotPosture","127.0.0.1",9559) # Handles postures of the robot
-camera = ALProxy("ALPhotoCapture","127.0.0.1",9559) # Handles the camera of the robot
-audio = ALProxy("ALAudioPlayer","127.0.0.1",9559) # Handles sound output
-myBroker = ALBroker("myBroker","0.0.0.0",0,"127.0.0.1",9559)
+motion = ALProxy("ALMotion",IP,9559) # Handles joint movements for the Nao
+posture = ALProxy("ALRobotPosture",IP,9559) # Handles postures of the robot
+camera = ALProxy("ALPhotoCapture",IP,9559) # Handles the camera of the robot
+audio = ALProxy("ALAudioPlayer",IP,9559) # Handles sound output
+myBroker = ALBroker("myBroker","0.0.0.0",0,IP,9559)
 HeadTouch = HeadTouch("HeadTouch")
 Finished = False
 perspective_mat = None # Holds the transformation matrix for the visual perspective
@@ -210,7 +211,7 @@ def sendInitScreen():
 	copyfile('resources/init_screen.jpg','image.jpg')
 
 # Sends an image for the finished program to the web server
-# No returns, no parameters, no varaible modifications, Modifies the image file for the web server (image.jpg)
+# No returns, no parameters, no varaible modifications, Modifies the image file for the web server (image.jpg)Nao
 # Just need to remove image.jpg and copy resources/fin_screen.jpg to image.jpg.
 def sendFinScreen():
 	if os.path.isfile('image.jpg'):
@@ -302,6 +303,7 @@ def getAffineTransform(pt1,pt2,pt3,pt4):
 	M = np.float32([[a,b,(1-a)*centerx - b*centery],[-b,a,b*centerx+(1-a)*centery]])
 	return M
 
+
 # TODO: Write this function
 # This function verifies that the blocks on the board match the blockList. Returns either True or False, with True being a match
 # No parameters, No modifications
@@ -324,18 +326,27 @@ def verifyBlocks():
 	img = cv2.bitwise_and(img,mask_bgr)
 	img = cv2.addWeighted(img,1,cv2.cvtColor(thresh_inv,cv2.COLOR_GRAY2BGR),1,0)
 	
-	# Get pt1 and pt2 from our created image
-	pt1 = l[0]
-	pt2 = l[1]
+	# At this point, img is our white-background perspectivized camera
+	# exp_img is our created image
+	
+	# Get pt1 and pt2 from our created image TODO: Actual returned values
+	pt1 = (160,314) #l[0]
+	pt2 = (287,314) #l[1]
 	
 	# TODO: Determine bottom two corners of blocks in img (pt3, pt4)
+	pt3 = (162,433)
+	pt4 = (473,445)
 	
 	# Rotate/Scale to match corners between exp_img and img, adjusting exp_img
 	M = getAffineTransform(pt1,pt2,pt3,pt4)
-	exp_img = cv2.warpAffine(img,M,(cols,rows))
-	# TODO: Apply translation to match images
-	# TODO: Calculation  between exp_img and img
-	# TODO: If norm<threshold: return True, Else: False
+	N = np.float32([[1,0,pt3[0]-pt1[0]],[0,1,pt3[1]-pt1[1]]])
+	exp_img = cv2.warpAffine(exp_img,M,(cols,rows)) # Rotate and scale our image
+	exp_img = cv2.warpAffine(exp_img,N,(cols,rows)) # Translate our image
+	exp_img[np.where((exp_img==[0,0,0]).all(axis=2))] = [255,255,255] # Turn background white, rather than black
+	n = cv2.norm(exp_img,img,cv2.NORM_L2)
+	d = absdiff(img,exp_img)
+	cv2.imwrite("diff.jpg",d)
+	NaoSay(str(int(n)))
 	
 	return True
 
