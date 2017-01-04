@@ -206,8 +206,8 @@ def sendCVBlockList():
 	# print "x_left = " + str(x_left) + " :: blockList[0].x = " + str(blockList[0].x)
 	y = (blockList[0].y * yUnit) + yOff
 	x_right = xUnit * blockList[0].width + x_left - 1
-	bot_L_pt = (1.0*x_left, 1.0*y)
-	bot_R_pt = (1.0*x_right, 1.0*y)
+	bot_L_pt = (1.0*x_left, 1.0*(imH-y-1))
+	bot_R_pt = (1.0*x_right, 1.0*(imH-y-1))
 
 	str_coords = "["
 	for b in blockList:
@@ -217,6 +217,9 @@ def sendCVBlockList():
 
 	res = cv2.flip(img,0)
 	cv2.imwrite('cvblocklist.jpg', res)
+	cv2.circle(res, bot_L_pt, 2, (255,0,255), -1)
+	cv2.circle(res, bot_R_pt, 2, (255,0,255), -1)
+	cv2.imwrite('debug_cv.jpg',res)
 	return [bot_L_pt,bot_R_pt]
 
 # Sends a default image for the introduction of the application
