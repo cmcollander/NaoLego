@@ -169,7 +169,9 @@ def sendBlockList():
 	res = cv2.flip(img,0)
 	cv2.imwrite('image.jpg', res)
 
-
+# Creates the image for computer vision verification.
+# Returns list of tuples as bottom left & right points of bottom-most block:
+# [(x_left, y_left), (x_right, y_right)]
 def sendCVBlockList():
 	imW = 640 # image width
 	imH = 480 # image height
@@ -183,6 +185,11 @@ def sendCVBlockList():
 	nubXOff = int(nubW - (nubW * 0.8125) ) # nub x-axis offset for where to begin drawing nub
 	img = np.zeros((imH, imW, 3), dtype=np.uint8)
 	img.fill(255)
+
+	bot_L_pt = (0,0)
+	bot_R_pt = (0,0)
+
+	doGrabBottomPoints = True
 	for block in blockList:
 		y = (block.y * yUnit) + yOff
 		for x in range(block.x, block.x + block.width):
@@ -198,8 +205,27 @@ def sendCVBlockList():
 			top_L = (curX+nubXOff, bot_R[1])
 			bot_R = (top_L[0]+nubW, top_L[1]+nubH)
 			cv2.rectangle(img, top_L, bot_R, block.color, -1)
+
+		# Gets bot left & right points of block
+		if doGrabBottomPoints:
+			x_left = block.x + xOff
+			x_right = xUnit * block.width + x_left - 1
+			bot_L_pt = (x_left, y)
+			bot_R_pt = (x_right, y)
+		doGrabBottomPoints = False # Stop grabbing bottom-most points after first block
+
+	print blockList[0].getCoords()
 	res = cv2.flip(img,0)
 	cv2.imwrite('cvblocklist.jpg', res)
+
+	# The image has been flipped along horizontal axis, so the y-values of
+	# the bottom points of the bottom-most block must be adjusted.
+	# image_height - bottom_y_value - 1 => new y coordinate
+	bot_L_pt = (bot_L_pt[0], imH-bot_L_pt[1]-1)
+	bot_R_pt = (bot_R_pt[0], imH-bot_R_pt[1]-1)
+
+	bot_corners = [bot_L_pt, bot_R_pt]
+	return bot_corners
 
 # Sends a default image for the introduction of the application
 # No returns, no parameters, no varaible modifications, Modifies the image file for the web server (image.jpg)
@@ -314,7 +340,7 @@ def verifyBlocks():
 	cv2.imwrite("frameP.jpg",img) # Save our new perspectivized image to frameP.jpg
 	sendCVBlockList() # Save our expected image to cvblocklist.jpg
 	exp_img = cv2.imread("cvblocklist.jpg") # Load our expected image to exp_img variable
-	
+
 	# Use thresholding to bitmask background away from img
 	gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 	thresh_inv = cv2.threshold(gray,0,255,cv2.THRESH_BINARY|cv2.THRESH_OTSU)[1]
@@ -322,10 +348,10 @@ def verifyBlocks():
 	mask_bgr = cv2.cvtColor(thresh,cv2.COLOR_GRAY2BGR)
 	img = cv2.bitwise_and(img,mask_bgr)
 	img = cv2.addWeighted(img,1,cv2.cvtColor(thresh_inv,cv2.COLOR_GRAY2BGR),1,0)
-	
+
 	# Get pt1 and pt2 from our created image
-	
-	
+
+
 	# TODO: Determine bottom two corners of blocks in img
 	# Translate/Rotate/Scale to match corners between exp_img and img, adjusting exp_img
 	cols,rows = (480,640)
@@ -333,7 +359,7 @@ def verifyBlocks():
 	exp_img = cv2.warpAffine(img,M,(cols,rows))
 	# TODO: Calculation  between exp_img and img
 	# TODO: If norm<threshold: return True, Else: False
-	
+
 	return True
 
 # -------------- MAIN -------------------------
