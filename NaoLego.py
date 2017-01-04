@@ -110,7 +110,7 @@ def addBlock():
 	else: # If this is not our first block...
 		prevcolor = blockList[-1].getColor()
 		nextcolor = presentBlockList[-1].getColor()
-		while prevcolor==nextcolor or (layer==1 and presentBlockList[-1].getWidth()==4) or (layer>1 and blockList[-2].getColor()==nextColor):
+		while prevcolor==nextcolor or (layer==1 and presentBlockList[-1].getWidth()==4) or (layer>1 and blockList[-2].getColor()==nextcolor):
 			random.shuffle(presentBlockList)
 			nextcolor = presentBlockList[-1].getColor()
 		newBlock = presentBlockList.pop()
@@ -170,9 +170,7 @@ def sendBlockList():
 	res = cv2.flip(img,0)
 	cv2.imwrite('image.jpg', res)
 
-# Creates the image for computer vision verification.
-# Returns list of tuples as bottom left & right points of bottom-most block:
-# [(x_left, y_left), (x_right, y_right)]
+
 def sendCVBlockList():
 	imW = 640 # image width
 	imH = 480 # image height
@@ -186,11 +184,6 @@ def sendCVBlockList():
 	nubXOff = int(nubW - (nubW * 0.8125) ) # nub x-axis offset for where to begin drawing nub
 	img = np.zeros((imH, imW, 3), dtype=np.uint8)
 	img.fill(255)
-
-	bot_L_pt = (0,0)
-	bot_R_pt = (0,0)
-
-	doGrabBottomPoints = True
 	for block in blockList:
 		y = (block.y * yUnit) + yOff
 		for x in range(block.x, block.x + block.width):
@@ -206,27 +199,8 @@ def sendCVBlockList():
 			top_L = (curX+nubXOff, bot_R[1])
 			bot_R = (top_L[0]+nubW, top_L[1]+nubH)
 			cv2.rectangle(img, top_L, bot_R, block.color, -1)
-
-		# Gets bot left & right points of block
-		if doGrabBottomPoints:
-			x_left = block.x + xOff
-			x_right = xUnit * block.width + x_left - 1
-			bot_L_pt = (x_left, y)
-			bot_R_pt = (x_right, y)
-		doGrabBottomPoints = False # Stop grabbing bottom-most points after first block
-
-	print blockList[0].getCoords()
 	res = cv2.flip(img,0)
 	cv2.imwrite('cvblocklist.jpg', res)
-
-	# The image has been flipped along horizontal axis, so the y-values of
-	# the bottom points of the bottom-most block must be adjusted.
-	# image_height - bottom_y_value - 1 => new y coordinate
-	bot_L_pt = (bot_L_pt[0], imH-bot_L_pt[1]-1)
-	bot_R_pt = (bot_R_pt[0], imH-bot_R_pt[1]-1)
-
-	bot_corners = [bot_L_pt, bot_R_pt]
-	return bot_corners
 
 # Sends a default image for the introduction of the application
 # No returns, no parameters, no varaible modifications, Modifies the image file for the web server (image.jpg)
@@ -320,7 +294,7 @@ def getAffineTransform(pt1,pt2,pt3,pt4):
 	pt2x,pt2y = pt2
 	pt3x,pt3y = pt3
 	pt4x,pt4y = pt4
-	scale = math.sqrt(((pt4y-pt3y)**2)+((pt4x-pt3x)**2))/(pt2y-pt1y)
+	scale = math.sqrt(((pt4y-pt3y)**2)+((pt4x-pt3x)**2))/(pt2x-pt1x)
 	theta = -1*math.atan((pt4y-pt3y)/(pt4x-pt3x))
 	centerx = pt1x
 	centery = pt1y
@@ -342,7 +316,7 @@ def verifyBlocks():
 	cv2.imwrite("frameP.jpg",img) # Save our new perspectivized image to frameP.jpg
 	l = sendCVBlockList() # Save our expected image to cvblocklist.jpg, return focus points
 	exp_img = cv2.imread("cvblocklist.jpg") # Load our expected image to exp_img variable
-
+	
 	# Use thresholding to bitmask background away from img
 	cols,rows = (480,640)
 	gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
@@ -351,28 +325,28 @@ def verifyBlocks():
 	mask_bgr = cv2.cvtColor(thresh,cv2.COLOR_GRAY2BGR)
 	img = cv2.bitwise_and(img,mask_bgr)
 	img = cv2.addWeighted(img,1,cv2.cvtColor(thresh_inv,cv2.COLOR_GRAY2BGR),1,0)
-
+	
 	# At this point, img is our white-background perspectivized camera
 	# exp_img is our created image
-
+	
 	# Get pt1 and pt2 from our created image TODO: Actual returned values
 	pt1 = (160,314) #l[0]
 	pt2 = (287,314) #l[1]
-
+	
 	# TODO: Determine bottom two corners of blocks in img (pt3, pt4)
 	pt3 = (162,433)
 	pt4 = (473,445)
-
+	
 	# Rotate/Scale to match corners between exp_img and img, adjusting exp_img
 	M = getAffineTransform(pt1,pt2,pt3,pt4)
 	N = np.float32([[1,0,pt3[0]-pt1[0]],[0,1,pt3[1]-pt1[1]]])
-	exp_img = cv2.warpAffine(exp_img,M,(cols,rows)) # Rotate and scale our image
-	exp_img = cv2.warpAffine(exp_img,N,(cols,rows)) # Translate our image
+	exp_img = cv2.warpAffine(exp_img,M,(rows,cols)) # Rotate and scale our image
+	exp_img = cv2.warpAffine(exp_img,N,(rows,cols)) # Translate our image
 	exp_img[np.where((exp_img==[0,0,0]).all(axis=2))] = [255,255,255] # Turn background white, rather than black
-	n = cv2.norm(exp_img,img,cv2.NORM_L2)
-	d = absdiff(img,exp_img)
+	#n = cv2.norm(exp_img,img,cv2.NORM_L2)
+	d = cv2.absdiff(img,exp_img)
 	cv2.imwrite("diff.jpg",d)
-	NaoSay(str(int(n)))
+	#NaoSay(str(int(n)))
 	
 	return True
 
