@@ -208,14 +208,21 @@ def sendCVBlockList():
 			cv2.rectangle(img, top_L, bot_R, block.color, -1)
 
 		# Gets bot left & right points of block
-		if doGrabBottomPoints:
-			x_left = block.x + xOff
-			x_right = xUnit * block.width + x_left - 1
-			bot_L_pt = (x_left, y)
-			bot_R_pt = (x_right, y)
-		doGrabBottomPoints = False # Stop grabbing bottom-most points after first block
+	if doGrabBottomPoints:
+		x_left = (blockList[0].x * xUnit) + xOff
+		# print "x_left = " + str(x_left) + " :: blockList[0].x = " + str(blockList[0].x)
+		y = (blockList[0].y * yUnit) + yOff
+		x_right = xUnit * blockList[0].width + x_left - 1
+		bot_L_pt = (x_left, y)
+		bot_R_pt = (x_right, y)
+	doGrabBottomPoints = False # Stop grabbing bottom-most points after first block
 
-	print blockList[0].getCoords()
+	str_coords = "["
+	for b in blockList:
+		 str_coords += str((b.x, b.y)) + ","
+	str_coords += "]"
+	# print str_coords
+
 	res = cv2.flip(img,0)
 	cv2.imwrite('cvblocklist.jpg', res)
 
@@ -373,7 +380,7 @@ def verifyBlocks():
 	d = absdiff(img,exp_img)
 	cv2.imwrite("diff.jpg",d)
 	NaoSay(str(int(n)))
-	
+
 	return True
 
 # -------------- MAIN -------------------------
