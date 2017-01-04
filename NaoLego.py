@@ -319,7 +319,7 @@ def getAffineTransform(pt1,pt2,pt3,pt4):
 	centery = pt1y
 	a = 1.0*scale*math.cos(theta)
 	b = 1.0*scale*math.sin(theta)
-	M = np.float32([[a,b,(1-a)*centerx - b*centery],[-b,a,b*centerx+(1-a)*centery]])
+	M = np.float32([[a,b,((1-a)*centerx) - (b*centery)],[-b,a,(b*centerx)+((1-a)*centery)]])
 	return M
 
 
@@ -384,7 +384,8 @@ def verifyBlocks():
 	cv2.circle(img_frame,pt3,10,(0,255,255),-1)
 	cv2.circle(img_frame,pt4,10,(0,255,0),-1)
 	cv2.imwrite("corners.jpg",img_frame)
-
+	
+	print str(pt1),str(pt2),str(pt3),str(pt4)
 
 
 	# Rotate/Scale to match corners between exp_img and img, adjusting exp_img
