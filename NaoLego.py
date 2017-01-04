@@ -200,15 +200,13 @@ def sendCVBlockList():
 			bot_R = (top_L[0]+nubW, top_L[1]+nubH)
 			cv2.rectangle(img, top_L, bot_R, block.color, -1)
 
-		# Gets bot left & right points of block
-	if doGrabBottomPoints:
-		x_left = (blockList[0].x * xUnit) + xOff
-		# print "x_left = " + str(x_left) + " :: blockList[0].x = " + str(blockList[0].x)
-		y = (blockList[0].y * yUnit) + yOff
-		x_right = xUnit * blockList[0].width + x_left - 1
-		bot_L_pt = (x_left, y)
-		bot_R_pt = (x_right, y)
-	doGrabBottomPoints = False # Stop grabbing bottom-most points after first block
+	# Gets bot left & right points of block
+	x_left = (blockList[0].x * xUnit) + xOff
+	# print "x_left = " + str(x_left) + " :: blockList[0].x = " + str(blockList[0].x)
+	y = (blockList[0].y * yUnit) + yOff
+	x_right = xUnit * blockList[0].width + x_left - 1
+	bot_L_pt = (x_left, y)
+	bot_R_pt = (x_right, y)
 
 	str_coords = "["
 	for b in blockList:
@@ -218,6 +216,7 @@ def sendCVBlockList():
 
 	res = cv2.flip(img,0)
 	cv2.imwrite('cvblocklist.jpg', res)
+	return [bot_L_pt,bot_R_pt]
 
 # Sends a default image for the introduction of the application
 # No returns, no parameters, no varaible modifications, Modifies the image file for the web server (image.jpg)
@@ -416,7 +415,6 @@ waitForHeadTouch()
 motion.setAngles("HeadPitch",HEADANGLE,0.1)
 time.sleep(1) # Allow time for our head to reach the correct location before obtaining points
 initPerspective() # Find our perspective transformation
-verifyBlocks() # Go ahead and obtain an image from the camera so we aren't looking at a previous picture
 
 # First block
 addBlock()
