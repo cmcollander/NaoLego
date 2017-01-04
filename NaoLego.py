@@ -343,10 +343,10 @@ def verifyBlocks():
 	exp_img = cv2.warpAffine(exp_img,M,(rows,cols)) # Rotate and scale our image
 	exp_img = cv2.warpAffine(exp_img,N,(rows,cols)) # Translate our image
 	exp_img[np.where((exp_img==[0,0,0]).all(axis=2))] = [255,255,255] # Turn background white, rather than black
-	#n = cv2.norm(exp_img,img,cv2.NORM_L2)
+	n = cv2.norm(exp_img,img,cv2.NORM_L2)
 	d = cv2.absdiff(img,exp_img)
 	cv2.imwrite("diff.jpg",d)
-	#NaoSay(str(int(n)))
+	NaoSay("The Norm is " + str(int(n))) # Relay the floored norm back to the user
 	
 	return True
 
