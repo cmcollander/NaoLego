@@ -417,7 +417,7 @@ def verifyBlocks():
 
 	NaoSay("The Norm is " + str(int(n))) # Relay the floored norm back to the user
 	
-	threshold = 24000 + 500*getOpenConnectorCount()	
+	threshold = 24000 + 600*getOpenConnectorCount()	
 
 	return n<threshold
 
