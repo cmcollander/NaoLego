@@ -20,6 +20,7 @@ import cv2
 import sys
 import math
 
+NOSAY = True
 SERVERPORT = 8080 # What port number with the hosted webserver be run on?
 NUMBLOCKS = 5 # Represents the number of blocks we will assemble
 IP = "127.0.0.1" # IP Address of the Nao. Since this is run from the Nao, this is localhost
@@ -205,8 +206,8 @@ def sendCVBlockList():
 	# print "x_left = " + str(x_left) + " :: blockList[0].x = " + str(blockList[0].x)
 	y = (blockList[0].y * yUnit) + yOff
 	x_right = xUnit * blockList[0].width + x_left - 1
-	bot_L_pt = (x_left, y)
-	bot_R_pt = (x_right, y)
+	bot_L_pt = (1.0*x_left, 1.0*y)
+	bot_R_pt = (1.0*x_right, 1.0*y)
 
 	str_coords = "["
 	for b in blockList:
@@ -237,6 +238,8 @@ def sendFinScreen():
 # Tells the NAO to say a message. Takes the message as a string parameters. No returns or modifications
 # Moves his head to look at the user while talking
 def NaoSay(s):
+	if NOSAY:
+		return
 	motion.setAngles("HeadPitch",0,0.1) # Look at the user
 	tts.say(s) # Say our message
 	motion.setAngles("HeadPitch",HEADANGLE,0.1) # Return to board
@@ -314,13 +317,12 @@ def getAffineTransform(pt1,pt2,pt3,pt4):
 	theta = -1*math.atan((pt4y-pt3y)/(pt4x-pt3x))
 	centerx = pt1x
 	centery = pt1y
-	a = scale*math.cos(theta)
-	b = scale*math.sin(theta)
+	a = 1.0*scale*math.cos(theta)
+	b = 1.0*scale*math.sin(theta)
 	M = np.float32([[a,b,(1-a)*centerx - b*centery],[-b,a,b*centerx+(1-a)*centery]])
 	return M
 
 
-# TODO: Write this function
 # This function verifies that the blocks on the board match the blockList. Returns either True or False, with True being a match
 # No parameters, No modifications
 def verifyBlocks():
@@ -353,11 +355,14 @@ def verifyBlocks():
 	img_frame = cv2.imread("frameP.jpg")
 	gray_frame = cv2.cvtColor(img_frame,cv2.COLOR_BGR2GRAY)
 	gray_frame = np.float32(gray_frame)
-	corners = cv2.goodFeaturesToTrack(gray_frame,numCorners,0.1,10)
+	corners = cv2.goodFeaturesToTrack(gray_frame,1000,0.1,10)
 	# Draw corner circles
 	for corner in corners:
 		x,y = corner.ravel()
-		cv2.circle(img_frame,(x,y),10,255,-1)
+		if y>=450:
+			corners.remove(corner)
+		else:
+			cv2.circle(img_frame,(x,y),10,255,-1)
 	# Flip corner points x and y for sorting
 	li = []
 	for corner in corners:
@@ -375,7 +380,7 @@ def verifyBlocks():
 	pt3 = featPoints[0]
 	pt4 = featPoints[1]
 
-	# Display and save teh corner points for visualization
+	# Display and save the corner points for visualization
 	cv2.circle(img_frame,pt3,10,(0,255,255),-1)
 	cv2.circle(img_frame,pt4,10,(0,255,0),-1)
 	cv2.imwrite("corners.jpg",img_frame)
@@ -385,9 +390,13 @@ def verifyBlocks():
 	# Rotate/Scale to match corners between exp_img and img, adjusting exp_img
 	M = getAffineTransform(pt1,pt2,pt3,pt4)
 	N = np.float32([[1,0,pt3[0]-pt1[0]],[0,1,pt3[1]-pt1[1]]])
+	cv2.imwrite("debug1.jpg",exp_img)
 	exp_img = cv2.warpAffine(exp_img,M,(rows,cols)) # Rotate and scale our image
+	cv2.imwrite("debug2.jpg",exp_img)
 	exp_img = cv2.warpAffine(exp_img,N,(rows,cols)) # Translate our image
+	cv2.imwrite("debug3.jpg",exp_img)
 	exp_img[np.where((exp_img==[0,0,0]).all(axis=2))] = [255,255,255] # Turn background white, rather than black
+	cv2.imwrite("debug4.jpg",exp_img)
 	n = cv2.norm(exp_img,img,cv2.NORM_L2)
 	d = cv2.absdiff(img,exp_img)
 	cv2.imwrite("diff.jpg",d)
