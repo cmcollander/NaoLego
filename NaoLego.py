@@ -330,12 +330,41 @@ def verifyBlocks():
 	# exp_img is our created image
 	
 	# Get pt1 and pt2 from our created image TODO: Actual returned values
-	pt1 = (160,314) #l[0]
-	pt2 = (287,314) #l[1]
+	pt1 = l[0]
+	pt2 = l[1]
 	
-	# TODO: Determine bottom two corners of blocks in img (pt3, pt4)
-	pt3 = (162,433)
-	pt4 = (473,445)
+	# Determine bottom two corners of blocks in img (pt3, pt4)
+	img_frame = cv2.imread("frameP.jpg")
+	gray_frame = cv2.cvtColor(img_frame,cv2.COLOR_BGR2GRAY)
+	gray_frame = np.float32(gray_frame)
+	corners = cv2.goodFeaturesToTrack(gray_frame,numCorners,0.1,10)
+	# Draw corner circles
+	for corner in corners:
+		x,y = corner.ravel()
+		cv2.circle(img_frame,(x,y),10,255,-1)
+	# Flip corner points x and y for sorting
+	li = []
+	for corner in corners:
+		x,y = corner.ravel()
+		li.append((y,x))
+	corners = []
+	li.sort() # Sort
+	# Flip back
+	for corner in li:
+		corners.append((corner[1],corner[0]))
+
+	# Feature points
+	featPoints = [corners[-1],corners[-2]]
+	featPoints.sort()
+	pt3 = featPoints[0]
+	pt4 = featPoints[1]
+
+	# Display and save teh corner points for visualization
+	cv2.circle(img_frame,pt3,10,(0,255,255),-1)
+	cv2.circle(img_frame,pt4,10,(0,255,0),-1)
+	cv2.imwrite("corners.jpg",img_frame)
+
+	
 	
 	# Rotate/Scale to match corners between exp_img and img, adjusting exp_img
 	M = getAffineTransform(pt1,pt2,pt3,pt4)
