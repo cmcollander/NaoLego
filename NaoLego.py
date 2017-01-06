@@ -8,6 +8,7 @@ from LegoBlock import LegoBlock
 from naoqi import ALProxy
 from naoqi import ALBroker
 
+import csv
 import cv2
 from shutil import copyfile
 import SimpleHTTPServer
@@ -26,6 +27,7 @@ SERVERPORT = 8080 # What port number with the hosted webserver be run on?
 NAOPORT = 9559 # What port number does the Nao's NAOQI software run on?
 IP = "127.0.0.1" # IP Address of the Nao. Since this is run from the Nao, this is localhost
 HEADANGLE = 0.28 # Calibrated so he does not see his feet
+RECORDTRAINING = True # Should we record training data?
 
 # Colors of blocks, represented as closely as possible to improve CV recognition through an accurate model
 DARKBLUE = (65,25,20)
@@ -75,6 +77,40 @@ presentBlockList.append(blue2x1)
 random.shuffle(presentBlockList) # Shuffle our presentBlockList
 
 blockList = [] # Represents a list of LegoBlocks that are in our assembly. Is initialized as empty
+
+def recordTraining(diff):
+	# BlueConns,GreenConns,RedConns,DarkBlueConns,OpenConnectors,Layers,diff : Correct/Incorrect (1/0)
+	training = []
+	blueConns = 0
+	greenConns = 0
+	redConns = 0
+	darkBlueConns = 0
+	
+	for block in blockList:
+		if block.getColor()==BLUE:
+			blueConns = blueConns + block.getWidth()
+		if block.getColor()==GREEN:
+			greenConns = greenConns + block.getWidth()
+		if block.getColor()==RED:
+			redConns = redConns + block.getWidth()
+		if block.getColor()==DARKBLUE:
+			darkBlueConns = darkBlueConns + block.getWidth()
+	
+	OpenConnectors = getOpenConnectorCount()
+	Layers = len(blockList)
+	correct = input("Correct? (0 or 1) :")
+	training.append(blueConns)
+	training.append(GreenConns)
+	training.append(redConns)
+	training.append(darkBlueConns)
+	training.append(OpenConnectors)
+	training.append(Layers)
+	training.append(correct)
+	
+	with open('training.csv', 'a') as csvfile:
+		csvwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+		csvwriter.writerow(training)
+	return correct
 
 # Initializes the camera settings
 def initCamera():
@@ -431,6 +467,10 @@ def verifyBlocks():
 	n = cv2.norm(exp_img,img,cv2.NORM_L2)
 	d = cv2.absdiff(img,exp_img)
 	cv2.imwrite("diff.jpg",d)
+	
+	# If we are reading data, use the inputed value as our return
+	if RECORDTRAINING:
+		return recordTraining(int(n))
 	
 	# Perform the actual comparison of our values
 	return compareThreshold(n)
