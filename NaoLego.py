@@ -109,7 +109,6 @@ def webServerThread():
 # Places a new block at a new layer on top of all previous blocks. Ensure the block does connect through at least one lego peg to the layer beneath it.
 # If the new block's x coord is less than 0, shift all blocks to the right until the block's x coord is 0.
 # The first layer is y coord 0, second is y coord 1, etc. Keep in mind that a 'standard' block is a height of 2 layers
-# Will not place a new block of the same color as the previous block, to improve CV recognition
 def addBlock():
 	# Find the current layer
 	layer = 0
@@ -126,11 +125,9 @@ def addBlock():
 		width = newBlock.getWidth()
 		newBlock.setCoords(0,0) # Our first block is placed at the origin
 	else: # If this is not our first block...
-		prevcolor = blockList[-1].getColor()
-		nextcolor = presentBlockList[-1].getColor()
-		while prevcolor==nextcolor or (layer==1 and presentBlockList[-1].getWidth()==4) or (layer>1 and blockList[-2].getColor()==nextcolor):
+		# Our second block must be 2 long
+		while (layer==1 and presentBlockList[-1].getWidth()==4):
 			random.shuffle(presentBlockList)
-			nextcolor = presentBlockList[-1].getColor()
 		newBlock = presentBlockList.pop()
 		height = newBlock.getHeight()
 		width = newBlock.getWidth()
@@ -138,6 +135,7 @@ def addBlock():
 		left = below.x-(width-1) # Obtain our leftmost possible location
 		right = below.width+below.x - 1 # Obtain our rightmost possible location
 		newx = random.randrange(left,right+1)
+		# Our second block must be placed FULLY on top of layer 1's 4 long block
 		if layer==1:
 			newx = random.randrange(0,3)
 		newBlock.setCoords(newx,layer) # The X coordinate is determined from Left and Right, The Y coordinate is the current layer
