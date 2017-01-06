@@ -1,55 +1,65 @@
 #! /usr/bin/python
 
-# TODO: Write function verifyBlocks
 # TODO: Obtain data such as time to add block, number of incorrect blocks, and individual error counters for wrong coordinates, wrong color, wrong size, etc.
 # TODO: At the end of the program, save the obtained data to a CSV file for future processing.
 
+from HeadTouch import HeadTouch
 from LegoBlock import LegoBlock
 from naoqi import ALProxy
 from naoqi import ALBroker
-from HeadTouch import HeadTouch
+
+import cv2
+from shutil import copyfile
 import SimpleHTTPServer
 import SocketServer
-import os
-from shutil import copyfile
-import time
-import thread
-import random
-import numpy as np
-import cv2
-import sys
 import math
+import numpy as np
+import os
+import random
+import sys
+import thread
+import time
 
-NOSAY = False
+# Function defines/constants
+NOSAY = False # If true, the NAO will not speak when not necessary. Makes for easier debugging
 SERVERPORT = 8080 # What port number with the hosted webserver be run on?
-NUMBLOCKS = 5 # Represents the number of blocks we will assemble
+NAOPORT = 9559 # What port number does the Nao's NAOQI software run on?
 IP = "127.0.0.1" # IP Address of the Nao. Since this is run from the Nao, this is localhost
-tts = ALProxy("ALTextToSpeech",IP,9559) # Handles speech from the Nao
-motion = ALProxy("ALMotion",IP,9559) # Handles joint movements for the Nao
-posture = ALProxy("ALRobotPosture",IP,9559) # Handles postures of the robot
-camera = ALProxy("ALPhotoCapture",IP,9559) # Handles the camera of the robot
-audio = ALProxy("ALAudioPlayer",IP,9559) # Handles sound output
-myBroker = ALBroker("myBroker","0.0.0.0",0,IP,9559)
-HeadTouch = HeadTouch("HeadTouch")
-Finished = False
-perspective_mat = None # Holds the transformation matrix for the visual perspective
 HEADANGLE = 0.28 # Calibrated so he does not see his feet
+BLUE = (220,110,0)
+GREEN = (0,180,0)
+RED = (0,0,200)
+
+
+
+# Global variables
+Finished = False # Represents if our program has finished running, used to stop the web server
+perspective_mat = None # Holds the transformation matrix for the visual perspective
+
+# NAO Modules 
+tts = ALProxy("ALTextToSpeech",IP,NAOPORT) # Handles speech from the Nao
+motion = ALProxy("ALMotion",IP,NAOPORT) # Handles joint movements for the Nao
+posture = ALProxy("ALRobotPosture",IP,NAOPORT) # Handles postures of the robot
+camera = ALProxy("ALPhotoCapture",IP,NAOPORT) # Handles the camera of the robot
+audio = ALProxy("ALAudioPlayer",IP,NAOPORT) # Handles sound output
+myBroker = ALBroker("myBroker","0.0.0.0",0,IP,NAOPORT) # Required for custom modules, such as HeadTouch
+HeadTouch = HeadTouch("HeadTouch") # Reacts to a head touch
 
 # What lego blocks do we have?
 presentBlockList = [] # Represents the list of LegoBlocks we actually have
-red4x1 = LegoBlock(4,1,(0,0,200),0,0)
-green4x1 = LegoBlock(4,1,(0,180,0),0,0)
-blue4x1a = LegoBlock(4,1,(220,110,0),0,0)
-blue4x1b = LegoBlock(4,1,(220,110,0),0,0)
-blue4x1c = LegoBlock(4,1,(220,110,0),0,0)
-blue4x1d = LegoBlock(4,1,(220,110,0),0,0)
-red2x1a = LegoBlock(2,1,(0,0,200),0,0)
-red2x1b = LegoBlock(2,1,(0,0,200),0,0)
-green2x1a = LegoBlock(2,1,(0,180,0),0,0)
-green2x1b = LegoBlock(2,1,(0,180,0),0,0)
-green2x1c = LegoBlock(2,1,(0,180,0),0,0)
-blue2x1a = LegoBlock(2,1,(220,110,0),0,0)
-blue2x1b = LegoBlock(2,1,(220,110,0),0,0)
+red4x1 = LegoBlock(4,1,RED,0,0)
+green4x1 = LegoBlock(4,1,GREEN,0,0)
+blue4x1a = LegoBlock(4,1,BLUE,0,0)
+blue4x1b = LegoBlock(4,1,BLUE,0,0)
+blue4x1c = LegoBlock(4,1,BLUE,0,0)
+blue4x1d = LegoBlock(4,1,BLUE,0,0)
+red2x1a = LegoBlock(2,1,RED,0,0)
+red2x1b = LegoBlock(2,1,RED,0,0)
+green2x1a = LegoBlock(2,1,GREEN,0,0)
+green2x1b = LegoBlock(2,1,GREEN,0,0)
+green2x1c = LegoBlock(2,1,GREEN,0,0)
+blue2x1a = LegoBlock(2,1,BLUE,0,0)
+blue2x1b = LegoBlock(2,1,BLUE,0,0)
 presentBlockList.append(red4x1)
 presentBlockList.append(green4x1)
 presentBlockList.append(blue4x1a)
@@ -65,7 +75,7 @@ presentBlockList.append(blue2x1a)
 presentBlockList.append(blue2x1b)
 random.shuffle(presentBlockList) # Shuffle our presentBlockList
 
-blockList = [] # Represents a list of LegoBlocks. Is initialized as empty
+blockList = [] # Represents a list of LegoBlocks that are in our assembly. Is initialized as empty
 
 # Initializes the camera settings
 def initCamera():
@@ -137,10 +147,7 @@ def addBlock():
 		prevBlock.setBits(inter)
 
 	# Shift all blocks to the right so they are all nonnegative coordinates
-	v = []
-	for block in blockList:
-		v.append(block.x)
-	offset = -1*min(v) # Determine the offset by the negative of the most leftmost x coordinate
+	offset = -1*min([block.x for block in blockList]) # Determine the offset by the negative of the most leftmost x coordinate
 	for block in blockList:
 		block.x = block.x + offset
 
@@ -247,10 +254,19 @@ def NaoSay(s):
 	tts.say(s) # Say our message
 	motion.setAngles("HeadPitch",HEADANGLE,0.1) # Return to board
 
-# The nao will prompt the user and wait until his head receives contact
-def waitForHeadTouch():
+# The nao will prompt the user and wait until his head receives contact (only use when prompting for a new block)
+def waitForHeadTouchAfterBlockPlaced():
 	global HeadTouch
-	tts.say("Please touch my head when you are ready.")
+	tts.say("Please touch my head when you have placed the assembly back on the board.")
+	HeadTouch.resetTouched();
+	while not HeadTouch.isTouched():
+		time.sleep(0.25)
+	playAudio("/home/nao/NaoLego/resources/ack.wav") # Play an audio file to acknowledge the head touch
+	
+# The nao will prompt the user and wait until his head receives contact
+def waitForHeadTouch:
+	global HeadTouch
+	tts.say("Please touch my head when you are ready to begin.")
 	HeadTouch.resetTouched();
 	while not HeadTouch.isTouched():
 		time.sleep(0.25)
@@ -295,6 +311,7 @@ def initPerspective():
 		[639, 479],
 		[0, 479]], dtype = "float32")
 	perspective_mat = cv2.getPerspectiveTransform(perspective_pts,dst)
+	
 	# Create an image of our initial image overlayed with our perspective points
 	p_img = img
 	p_list = perspective_pts.tolist()
@@ -313,7 +330,6 @@ def getOpenConnectorCount():
 			count = count + int(not not bv&(1<<b))
 	return count
 			
-
 # Apply perspective correction
 def perspectiveCorrection(frame):
 	return cv2.warpPerspective(frame,perspective_mat,(640,480))
@@ -373,21 +389,21 @@ def verifyBlocks():
 	for corner in corners:
 		x,y = corner.ravel()
 		if y<450:
-			corners2.append(corner)
+			corners2.append(corner) # Only use corners that lie above the y=450 line
 			cv2.circle(img_frame,(x,y),10,255,-1)
 	corners = corners2
-	# Flip corner points x and y for sorting
+	
+	# Sort the points by their y values
 	li = []
 	for corner in corners:
 		x,y = corner.ravel()
 		li.append((y,x))
 	corners = []
-	li.sort() # Sort
-	# Flip back
+	li.sort()
 	for corner in li:
 		corners.append((corner[1],corner[0]))
 
-	# Feature points
+	# Feature points (the bottom 2 points)
 	featPoints = [corners[-1],corners[-2]]
 	featPoints.sort()
 	pt3 = featPoints[0]
@@ -397,25 +413,21 @@ def verifyBlocks():
 	cv2.circle(img_frame,pt3,10,(0,255,255),-1)
 	cv2.circle(img_frame,pt4,10,(0,255,0),-1)
 	cv2.imwrite("corners.jpg",img_frame)
-	
-	print str(pt1),str(pt2),str(pt3),str(pt4)
-
 
 	# Rotate/Scale to match corners between exp_img and img, adjusting exp_img
 	M = getAffineTransform(pt1,pt2,pt3,pt4)
 	N = np.float32([[1,0,pt3[0]-pt1[0]],[0,1,pt3[1]-pt1[1]]])
-	cv2.imwrite("debug1.jpg",exp_img)
 	exp_img = cv2.warpAffine(exp_img,M,(rows,cols)) # Rotate and scale our image
-	cv2.imwrite("debug2.jpg",exp_img)
 	exp_img = cv2.warpAffine(exp_img,N,(rows,cols)) # Translate our image
-	cv2.imwrite("debug3.jpg",exp_img)
 	exp_img[np.where((exp_img==[0,0,0]).all(axis=2))] = [255,255,255] # Turn background white, rather than black
-	cv2.imwrite("debug4.jpg",exp_img)
+	
+	# Determine the norm between the model and the camera and save this image for visualizing
 	n = cv2.norm(exp_img,img,cv2.NORM_L2)
 	d = cv2.absdiff(img,exp_img)
 	cv2.imwrite("diff.jpg",d)
 
-	NaoSay("The Norm is " + str(int(n))) # Relay the floored norm back to the user
+	# Only use the below line for debugging thresholds.
+	# NaoSay("The Norm is " + str(int(n))) # Relay the floored norm back to the user
 	
 	threshold = 24000 + 600*getOpenConnectorCount()	
 
@@ -435,11 +447,14 @@ posture.goToPosture("StandInit",1.0)
 
 NaoSay("Hello! Thank you for playing my Lego Assembly game. First, please ensure that the board in front of me is clear and you have logged into my webserver. My server address is 192.168.1.12 port 8 0 8 0.")
 waitForHeadTouch()
+NaoSay("Give me one moment to analyze the board.")
 
 # Determine the points of our paper and our perspective
 motion.setAngles("HeadPitch",HEADANGLE,0.1)
 time.sleep(1) # Allow time for our head to reach the correct location before obtaining points
 initPerspective() # Find our perspective transformation
+
+NaoSay("Great! We will be assembling a group of legos step by step. When prompted, please recreate the assembly I will show you and place it on the board, as straight as possible, with the connectors facing me.")
 
 # First block
 addBlock()
@@ -451,7 +466,7 @@ while not verifyBlocks():
 	waitForHeadTouch()
 
 # Ready for additional blocks
-for lcv in range(NUMBLOCKS-1): # -1 since we already placed 1 block
+for lcv in range(4): # Place 4 additional blocks, for a total of 5 layers
 	addBlock()
 	sendBlockList()
 	NaoSay("Good Job. Now, please add this new block to the assembly.")
