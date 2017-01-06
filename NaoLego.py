@@ -149,6 +149,7 @@ def addBlock():
 		inter = list(set(thisBlockXList)&set(prevBlockXList))
 		subVal = inter[0]
 		inter[:] = [x - subVal for x in inter]
+		print "INTERS: "+str(inter)
 		prevBlock.setBits(inter)
 
 	# Shift all blocks to the right so they are all nonnegative coordinates
