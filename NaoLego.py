@@ -331,9 +331,8 @@ def getOpenConnectorCount():
 	count = 0
 	for block in blockList:
 		bv = block.getbitArray()
-		width = block.getWidth()
-		for b in range(width):
-			if ((1<<b)&bv)>0:
+		for b in bv:
+			if b==False:
 				count = count + 1
 	return count
 			
