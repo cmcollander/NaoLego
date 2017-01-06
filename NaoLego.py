@@ -21,7 +21,7 @@ import thread
 import time
 
 # Function defines/constants
-NOSAY = False # If true, the NAO will not speak when not necessary. Makes for easier debugging
+NOSAY = True # If true, the NAO will not speak when not necessary. Makes for easier debugging
 SERVERPORT = 8080 # What port number with the hosted webserver be run on?
 NAOPORT = 9559 # What port number does the Nao's NAOQI software run on?
 IP = "127.0.0.1" # IP Address of the Nao. Since this is run from the Nao, this is localhost
@@ -445,7 +445,8 @@ def compareThreshold(norm):
 		comp = '>'
 	s = str(n) + comp + str(thresh)
 	print s # Send our norm and thresh results to standard output for analysis
-	return n<thresh
+	# return n<thresh
+	return True
 
 # -------------- MAIN -------------------------
 
