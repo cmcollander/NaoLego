@@ -26,8 +26,10 @@ SERVERPORT = 8080 # What port number with the hosted webserver be run on?
 NAOPORT = 9559 # What port number does the Nao's NAOQI software run on?
 IP = "127.0.0.1" # IP Address of the Nao. Since this is run from the Nao, this is localhost
 HEADANGLE = 0.28 # Calibrated so he does not see his feet
+
+# Colors of blocks, represented as closely as possible to improve CV recognition through an accurate model
 DARKBLUE = (65,25,20)
-BLUE = (220,110,0)
+BLUE = (147,60,15)
 GREEN = (30,120,23)
 RED = (18,16,180)
 
@@ -486,7 +488,7 @@ for lcv in range(4): # Place 4 additional blocks, for a total of 5 layers
 	NaoSay("Good Job. Now, please add this new block to the assembly.")
 	waitForHeadTouchAfterBlockPlaced()
 	while not verifyBlocks():
-		NaoSay("I'm sorry, that doesn't look right. Please place the assmebly shown in the image.")
+		NaoSay("I'm sorry, that doesn't look right. Please place the assembly shown in the image.")
 		waitForHeadTouchAfterBlockPlaced()
 
 sendFinScreen()
