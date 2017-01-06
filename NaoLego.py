@@ -333,7 +333,8 @@ def getOpenConnectorCount():
 		bv = block.getbitArray()
 		width = block.getWidth()
 		for b in range(width):
-			count = count + int(not not bv&(1<<b))
+			if ((1<<b)&bv)>0:
+				count = count + 1
 	return count
 			
 # Apply perspective correction
