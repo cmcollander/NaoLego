@@ -78,8 +78,8 @@ random.shuffle(presentBlockList) # Shuffle our presentBlockList
 
 blockList = [] # Represents a list of LegoBlocks that are in our assembly. Is initialized as empty
 
-def recordTraining(diff):
-	# BlueConns,GreenConns,RedConns,DarkBlueConns,OpenConnectors,Layers,diff : Correct/Incorrect (1/0)
+def recordTraining(diff,yValue):
+	# BlueConns,GreenConns,RedConns,DarkBlueConns,OpenConnectors,Layers,yValue,diff : Correct/Incorrect (1/0)
 	training = []
 	blueConns = 0
 	greenConns = 0
@@ -100,11 +100,13 @@ def recordTraining(diff):
 	Layers = len(blockList)
 	correct = input("Correct? (0 or 1) :")
 	training.append(blueConns)
-	training.append(GreenConns)
+	training.append(greenConns)
 	training.append(redConns)
 	training.append(darkBlueConns)
 	training.append(OpenConnectors)
 	training.append(Layers)
+	training.append(yValue)
+	training.append(diff)
 	training.append(correct)
 	
 	with open('training.csv', 'a') as csvfile:
@@ -470,7 +472,7 @@ def verifyBlocks():
 	
 	# If we are reading data, use the inputed value as our return
 	if RECORDTRAINING:
-		return recordTraining(int(n))
+		return recordTraining(int(n),pt3[1])
 	
 	# Perform the actual comparison of our values
 	return compareThreshold(n)
