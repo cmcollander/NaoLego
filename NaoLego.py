@@ -26,9 +26,10 @@ SERVERPORT = 8080 # What port number with the hosted webserver be run on?
 NAOPORT = 9559 # What port number does the Nao's NAOQI software run on?
 IP = "127.0.0.1" # IP Address of the Nao. Since this is run from the Nao, this is localhost
 HEADANGLE = 0.28 # Calibrated so he does not see his feet
+DARKBLUE = (65,25,20)
 BLUE = (220,110,0)
-GREEN = (0,180,0)
-RED = (0,0,200)
+GREEN = (30,120,23)
+RED = (18,16,180)
 
 # Global variables
 Finished = False # Represents if our program has finished running, used to stop the web server
@@ -56,8 +57,7 @@ red2x1b = LegoBlock(2,1,RED,0,0)
 green2x1a = LegoBlock(2,1,GREEN,0,0)
 green2x1b = LegoBlock(2,1,GREEN,0,0)
 green2x1c = LegoBlock(2,1,GREEN,0,0)
-blue2x1a = LegoBlock(2,1,BLUE,0,0)
-blue2x1b = LegoBlock(2,1,BLUE,0,0)
+blue2x1 = LegoBlock(2,1,DARKBLUE,0,0)
 presentBlockList.append(red4x1)
 presentBlockList.append(green4x1)
 presentBlockList.append(blue4x1a)
@@ -69,8 +69,7 @@ presentBlockList.append(red2x1b)
 presentBlockList.append(green2x1a)
 presentBlockList.append(green2x1b)
 presentBlockList.append(green2x1c)
-presentBlockList.append(blue2x1a)
-presentBlockList.append(blue2x1b)
+presentBlockList.append(blue2x1)
 random.shuffle(presentBlockList) # Shuffle our presentBlockList
 
 blockList = [] # Represents a list of LegoBlocks that are in our assembly. Is initialized as empty
