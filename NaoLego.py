@@ -147,8 +147,7 @@ def addBlock():
 		prevBlock = blockList[-2]
 		prevBlockXList = range(prevBlock.x,prevBlock.x+prevBlock.width)
 		inter = list(set(thisBlockXList)&set(prevBlockXList))
-		subVal = inter[0] - prevBlock.x
-		subVal = inter[0]
+		subVal = prevBlock.x
 		inter[:] = [x - subVal for x in inter]
 		print "INTERS: "+str(inter)
 		prevBlock.setBits(inter)
