@@ -30,8 +30,6 @@ BLUE = (220,110,0)
 GREEN = (0,180,0)
 RED = (0,0,200)
 
-
-
 # Global variables
 Finished = False # Represents if our program has finished running, used to stop the web server
 perspective_mat = None # Holds the transformation matrix for the visual perspective
@@ -88,11 +86,19 @@ def playAudio(file):
 	fileID = audio.loadFile(file)
 	audio.play(fileID)
 
+# Define a custom webserver so no printing to stdout (leave for our own debugging messages)
+class TestServer(SocketServer.TCPServer):
+	allow_reuse_address = True 
+	logging = False
+class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+	def log_message(self, format, *args):
+		if self.server.logging:
+			SimpleHTTPServer.SimpleHTTPRequestHandler.log_message(self, format, *args)
+	
 # Starts a webserver to display index.html. Is run in a separate thread
 def webServerThread():
-	SocketServer.TCPServer.allow_reuse_address = True
-	Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
-	httpd = SocketServer.TCPServer(("",SERVERPORT),Handler)
+	Handler = MyHandler
+	httpd = TestServer(("",SERVERPORT),Handler)
 	while not Finished:
 		httpd.handle_request()
 	httpd.shutdown()
@@ -257,14 +263,14 @@ def NaoSay(s):
 # The nao will prompt the user and wait until his head receives contact (only use when prompting for a new block)
 def waitForHeadTouchAfterBlockPlaced():
 	global HeadTouch
-	tts.say("Please touch my head when you have placed the assembly back on the board.")
+	tts.say("Please touch my head when you have placed the assembly on the board.")
 	HeadTouch.resetTouched();
 	while not HeadTouch.isTouched():
 		time.sleep(0.25)
 	playAudio("/home/nao/NaoLego/resources/ack.wav") # Play an audio file to acknowledge the head touch
 	
 # The nao will prompt the user and wait until his head receives contact
-def waitForHeadTouch:
+def waitForHeadTouch():
 	global HeadTouch
 	tts.say("Please touch my head when you are ready to begin.")
 	HeadTouch.resetTouched();
@@ -425,13 +431,22 @@ def verifyBlocks():
 	n = cv2.norm(exp_img,img,cv2.NORM_L2)
 	d = cv2.absdiff(img,exp_img)
 	cv2.imwrite("diff.jpg",d)
-
-	# Only use the below line for debugging thresholds.
-	# NaoSay("The Norm is " + str(int(n))) # Relay the floored norm back to the user
 	
-	threshold = 24000 + 600*getOpenConnectorCount()	
+	# Perform the actual comparison of our values
+	return compareThreshold(n)
 
-	return n<threshold
+# This function handles the actual threshold comparison
+def compareThreshold(norm):
+	n = int(norm)
+	thresh = 24000 + 600*getOpenConnectorCount()
+	comp = '='
+	if n<thresh:
+		comp = '<'
+	if n>thresh:
+		comp = '>'
+	s = str(n) + comp + str(thresh)
+	print s # Send our norm and thresh results to standard output for analysis
+	return n<thresh
 
 # -------------- MAIN -------------------------
 
@@ -460,20 +475,20 @@ NaoSay("Great! We will be assembling a group of legos step by step. When prompte
 addBlock()
 NaoSay("Lets start by adding a single block")
 sendBlockList()
-waitForHeadTouch()
+waitForHeadTouchAfterBlockPlaced()
 while not verifyBlocks():
-	NaoSay("I'm sorry, that is not the correct block. Please place the block shown in the image.")
-	waitForHeadTouch()
+	NaoSay("I'm sorry, that doesn't look right. Please place the block shown in the image.")
+	waitForHeadTouchAfterBlockPlaced()
 
 # Ready for additional blocks
 for lcv in range(4): # Place 4 additional blocks, for a total of 5 layers
 	addBlock()
 	sendBlockList()
 	NaoSay("Good Job. Now, please add this new block to the assembly.")
-	waitForHeadTouch()
+	waitForHeadTouchAfterBlockPlaced()
 	while not verifyBlocks():
-		NaoSay("I'm sorry, that is not the correct block. Please place the block shown in the image.")
-		waitForHeadTouch()
+		NaoSay("I'm sorry, that doesn't look right. Please place the assmebly shown in the image.")
+		waitForHeadTouchAfterBlockPlaced()
 
 sendFinScreen()
 Finished = True
