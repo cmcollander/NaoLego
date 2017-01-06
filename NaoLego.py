@@ -438,6 +438,7 @@ def verifyBlocks():
 def compareThreshold(norm):
 	n = int(norm)
 	thresh = 20000 + 600*getOpenConnectorCount()
+	print "CONN: "+str(getOpenConnectorCount())
 	comp = '='
 	if n<thresh:
 		comp = '<'
