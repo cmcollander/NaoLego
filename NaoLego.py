@@ -1,8 +1,5 @@
 #! /usr/bin/python
 
-# TODO: Obtain data such as time to add block, number of incorrect blocks, and individual error counters for wrong coordinates, wrong color, wrong size, etc.
-# TODO: At the end of the program, save the obtained data to a CSV file for future processing.
-
 from HeadTouch import HeadTouch
 from LegoBlock import LegoBlock
 from naoqi import ALProxy
@@ -109,10 +106,36 @@ def recordTraining(diff,yValue):
 	training.append(diff)
 	training.append(correct)
 	
-	with open('training.csv', 'a') as csvfile:
+	with open('data.csv', 'a') as csvfile:
 		csvwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 		csvwriter.writerow(training)
 	return correct
+
+def classify(diff, yValue):
+	blueConns = 0
+	greenConns = 0
+	redConns = 0
+	darkBlueConns = 0
+	for block in blockList:
+		if block.getColor()==BLUE:
+			blueConns = blueConns + block.getWidth()
+		if block.getColor()==GREEN:
+			greenConns = greenConns + block.getWidth()
+		if block.getColor()==RED:
+			redConns = redConns + block.getWidth()
+		if block.getColor()==DARKBLUE:
+			darkBlueConns = darkBlueConns + block.getWidth()
+	OpenConnectors = getOpenConnectorCount()
+	Layers = len(blockList)
+	
+	# Let's save our data.
+	# We can add it back to the same CSV file, just using a 2 value indicating it is not training data
+	with open('data.csv', 'a') as csvfile:
+		csvwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+		csvwriter.writerow([blueConns,greenConns,redConns,darkBlueConns,OpenConnectors,Layers,yValue,diff,2)
+	return correct
+	######################## PLACE CLASSIFIER CODE HERE ############################
+	return True
 
 # Initializes the camera settings
 def initCamera():
@@ -120,7 +143,7 @@ def initCamera():
 	camera.setPictureFormat("jpg")
 	camera.setCameraID(1)
 
-# Plays the audio file given as a parameter
+# Plays the audio file (as a filename string) given as a parameter
 def playAudio(file):
 	fileID = audio.loadFile(file)
 	audio.play(fileID)
@@ -470,27 +493,12 @@ def verifyBlocks():
 	d = cv2.absdiff(img,exp_img)
 	cv2.imwrite("diff.jpg",d)
 	
-	# If we are reading data, use the inputed value as our return
+	# If we are reading data, use the inputed value as our return, and save our information as training data
 	if RECORDTRAINING:
 		return recordTraining(int(n),pt3[1])
 	
-	# Perform the actual comparison of our values
-	return compareThreshold(n)
-
-# This function handles the actual threshold comparison
-def compareThreshold(norm):
-	n = int(norm)
-	thresh = 20000 + 600*getOpenConnectorCount()
-	print "CONN: "+str(getOpenConnectorCount())
-	comp = '='
-	if n<thresh:
-		comp = '<'
-	if n>thresh:
-		comp = '>'
-	s = str(n) + comp + str(thresh)
-	print s # Send our norm and thresh results to standard output for analysis
-	# return n<thresh
-	return True
+	# Perform the actual analysis of our values using the decision tree classifier, and save our info as obtained data
+	return classify(int(n),pt3[1])
 
 # -------------- MAIN -------------------------
 
