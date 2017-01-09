@@ -429,12 +429,12 @@ def tree(blueConns, greenConns, redConns, darkBlueConns, OpenConnectors, Layers,
 							return False
 						else:  # if yValue > 194.0
 							if yValue <= 334.0:
-								if redConns <= 1.0:
-									if diff <= 17156.5:
+								if yValue <= 223.0:
+									if redConns <= 1.0:
 										return False
-									else:  # if diff > 17156.5
+									else:  # if redConns > 1.0
 										return True
-								else:  # if redConns > 1.0
+								else:  # if yValue > 223.0
 									return True
 							else:  # if yValue > 334.0
 								if blueConns <= 2.0:
@@ -444,25 +444,16 @@ def tree(blueConns, greenConns, redConns, darkBlueConns, OpenConnectors, Layers,
 					else:  # if diff > 17753.5
 						return False
 				else:  # if OpenConnectors > 5.5
-					if diff <= 20828.5:
-						if OpenConnectors <= 6.5:
-							if yValue <= 263.5:
-								return True
-							else:  # if yValue > 263.5
-								if diff <= 19762.5:
-									return False
-								else:  # if diff > 19762.5
-									return True
-						else:  # if OpenConnectors > 6.5
-							return True
-					else:  # if diff > 20828.5
+					if diff <= 20712.0:
+						return True
+					else:  # if diff > 20712.0
 						if diff <= 21268.5:
 							if yValue <= 285.5:
 								return False
 							else:  # if yValue > 285.5
-								if greenConns <= 1.0:
+								if OpenConnectors <= 7.5:
 									return False
-								else:  # if greenConns > 1.0
+								else:  # if OpenConnectors > 7.5
 									return True
 						else:  # if diff > 21268.5
 							return True
@@ -498,9 +489,9 @@ def tree(blueConns, greenConns, redConns, darkBlueConns, OpenConnectors, Layers,
 						if yValue <= 317.0:
 							return False
 						else:  # if yValue > 317.0
-							if diff <= 24769.5:
+							if OpenConnectors <= 8.5:
 								return True
-							else:  # if diff > 24769.5
+							else:  # if OpenConnectors > 8.5
 								return False
 				else:  # if yValue > 358.0
 					return True
