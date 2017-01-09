@@ -419,16 +419,23 @@ def getAffineTransform(pt1,pt2,pt3,pt4):
 
 # Our generated tree function
 def tree(blueConns, greenConns, redConns, darkBlueConns, OpenConnectors, Layers, yValue, diff):
-	if diff <= 19095.5:
+	if diff <= 19075.5:
 		return True
-	else:  # if diff > 19095.5
-		if OpenConnectors <= 7.5:
-			return False
-		else:  # if OpenConnectors > 7.5
-			if diff <= 24880.0:
-				return True
-			else:  # if diff > 24880.0
+	else:  # if diff > 19075.5
+		if yValue <= 399.5:
+			if OpenConnectors <= 7.5:
 				return False
+			else:  # if OpenConnectors > 7.5
+				if diff <= 23308.0:
+					return True
+				else:  # if diff > 23308.0
+					return False
+		else:  # if yValue > 399.5
+			if diff <= 27095.5:
+				return True
+			else:  # if diff > 27095.5
+				return False
+
 
 
 
