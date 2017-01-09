@@ -70,7 +70,7 @@ presentBlockList.append(red2x1b)
 presentBlockList.append(green2x1a)
 presentBlockList.append(green2x1b)
 presentBlockList.append(green2x1c)
-presentBlockList.append(blue2x1)
+#presentBlockList.append(blue2x1) # DO NOT USE DARK BLUE 2x1 BLOCK
 random.shuffle(presentBlockList) # Shuffle our presentBlockList
 
 blockList = [] # Represents a list of LegoBlocks that are in our assembly. Is initialized as empty
