@@ -21,7 +21,7 @@ def tree_to_code(tree, feature_names):
 			recurse(tree_.children_right[node], depth + 1)
 		else:
 			val = "False"
-			if tree_.value[node][0][0]<1:
+			if tree_.value[node][0][0]<tree_.value[node][0][1]:
 				val = "True"
 			print "{}return {}".format(indent, val)
 	recurse(0, 1)
@@ -39,7 +39,7 @@ with open('data.csv','rb') as csvfile:
 				x.append(row[:-1])
 				y.append(row[-1])
 
-clf = tree.DecisionTreeClassifier()
+clf = tree.DecisionTreeClassifier(max_samples_leaf = 10)
 clf = clf.fit(x,y)
 
 tree_to_code(clf,["blueConns","greenConns","redConns","darkBlueConns","OpenConnectors","Layers","yValue","diff"])
