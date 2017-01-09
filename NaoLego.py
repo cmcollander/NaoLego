@@ -420,10 +420,10 @@ def getAffineTransform(pt1,pt2,pt3,pt4):
 # Our generated tree function
 def tree(blueConns, greenConns, redConns, darkBlueConns, OpenConnectors, Layers, yValue, diff):
 	if diff <= 22001.0:
-		if diff <= 16188.5:
-			return True
-		else:  # if diff > 16188.5
-			if yValue <= 363.5:
+		if yValue <= 363.5:
+			if diff <= 16188.5:
+				return True
+			else:  # if diff > 16188.5
 				if OpenConnectors <= 5.5:
 					if diff <= 17753.5:
 						if yValue <= 194.0:
@@ -431,10 +431,10 @@ def tree(blueConns, greenConns, redConns, darkBlueConns, OpenConnectors, Layers,
 						else:  # if yValue > 194.0
 							if yValue <= 334.0:
 								if yValue <= 223.0:
-									if redConns <= 1.0:
-										return False
-									else:  # if redConns > 1.0
+									if yValue <= 208.0:
 										return True
+									else:  # if yValue > 208.0
+										return False
 								else:  # if yValue > 223.0
 									return True
 							else:  # if yValue > 334.0
@@ -458,18 +458,12 @@ def tree(blueConns, greenConns, redConns, darkBlueConns, OpenConnectors, Layers,
 									return True
 						else:  # if diff > 21268.5
 							return True
-			else:  # if yValue > 363.5
-				if diff <= 19515.0:
-					return True
-				else:  # if diff > 19515.0
-					if diff <= 19768.5:
-						return False
-					else:  # if diff > 19768.5
-						return True
+		else:  # if yValue > 363.5
+			return True
 	else:  # if diff > 22001.0
 		if OpenConnectors <= 7.5:
 			if diff <= 23669.5:
-				if diff <= 23616.5:
+				if greenConns <= 4.0:
 					if yValue <= 365.5:
 						return False
 					else:  # if yValue > 365.5
@@ -477,7 +471,7 @@ def tree(blueConns, greenConns, redConns, darkBlueConns, OpenConnectors, Layers,
 							return True
 						else:  # if yValue > 378.5
 							return False
-				else:  # if diff > 23616.5
+				else:  # if greenConns > 4.0
 					return True
 			else:  # if diff > 23669.5
 				return False
@@ -507,6 +501,7 @@ def tree(blueConns, greenConns, redConns, darkBlueConns, OpenConnectors, Layers,
 							return False
 				else:  # if greenConns > 5.0
 					return True
+
 
 
 
