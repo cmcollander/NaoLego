@@ -30,9 +30,11 @@ y = []
 with open('data.csv','rb') as csvfile:
 	reader = csv.reader(csvfile,delimiter=' ',quotechar='|')
 	for row in reader:
-		if row[-1]==0 or row[-1]==1: # We only want final values of 0 or 1 as they are the training data
-			x.append(row[:-1])
-			y.append(row[1])
+		if len(row)==9:
+			row = [int(float(n)) for n in row]
+			if row[-1]==0 or row[-1]==1: # We only want final values of 0 or 1 as they are the training data
+				x.append(row[:-1])
+				y.append(row[-1])
 
 clf = tree.DecisionTreeClassifier()
 clf = clf.fit(x,y)
