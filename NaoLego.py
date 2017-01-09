@@ -420,91 +420,48 @@ def getAffineTransform(pt1,pt2,pt3,pt4):
 # Our generated tree function
 def tree(blueConns, greenConns, redConns, darkBlueConns, OpenConnectors, Layers, yValue, diff):
 	if diff <= 22001.0:
-		if yValue <= 363.5:
-			if diff <= 16188.5:
-				return True
-			else:  # if diff > 16188.5
-				if OpenConnectors <= 5.5:
-					if diff <= 17753.5:
-						if yValue <= 194.0:
-							return False
-						else:  # if yValue > 194.0
-							if yValue <= 334.0:
-								if yValue <= 223.0:
-									if yValue <= 208.0:
-										return True
-									else:  # if yValue > 208.0
-										return False
-								else:  # if yValue > 223.0
-									return True
-							else:  # if yValue > 334.0
-								if blueConns <= 2.0:
-									return False
-								else:  # if blueConns > 2.0
-									return True
-					else:  # if diff > 17753.5
-						return False
-				else:  # if OpenConnectors > 5.5
-					if diff <= 20712.0:
-						return True
-					else:  # if diff > 20712.0
-						if diff <= 21268.5:
-							if yValue <= 285.5:
-								return False
-							else:  # if yValue > 285.5
-								if OpenConnectors <= 7.5:
-									return False
-								else:  # if OpenConnectors > 7.5
-									return True
-						else:  # if diff > 21268.5
-							return True
-		else:  # if yValue > 363.5
+		if diff <= 16583.0:
 			return True
-	else:  # if diff > 22001.0
-		if OpenConnectors <= 7.5:
-			if diff <= 23669.5:
-				if greenConns <= 4.0:
-					if yValue <= 365.5:
-						return False
-					else:  # if yValue > 365.5
-						if yValue <= 378.5:
-							return True
-						else:  # if yValue > 378.5
-							return False
-				else:  # if greenConns > 4.0
-					return True
-			else:  # if diff > 23669.5
-				return False
-		else:  # if OpenConnectors > 7.5
-			if diff <= 25661.5:
-				if yValue <= 358.0:
-					if yValue <= 260.0:
+		else:  # if diff > 16583.0
+			if yValue <= 326.5:
+				if OpenConnectors <= 5.5:
+					return False
+				else:  # if OpenConnectors > 5.5
+					if diff <= 20372.0:
 						return True
-					else:  # if yValue > 260.0
-						if yValue <= 317.0:
+					else:  # if diff > 20372.0
+						if diff <= 21087.5:
 							return False
-						else:  # if yValue > 317.0
-							if OpenConnectors <= 8.5:
-								return True
-							else:  # if OpenConnectors > 8.5
-								return False
-				else:  # if yValue > 358.0
-					return True
-			else:  # if diff > 25661.5
-				if greenConns <= 5.0:
-					if yValue <= 412.0:
-						return False
-					else:  # if yValue > 412.0
-						if yValue <= 420.0:
+						else:  # if diff > 21087.5
 							return True
-						else:  # if yValue > 420.0
+			else:  # if yValue > 326.5
+				if yValue <= 365.5:
+					if OpenConnectors <= 5.5:
+						if diff <= 17894.0:
+							if redConns <= 2.0:
+								return True
+							else:  # if redConns > 2.0
+								if redConns <= 5.0:
+									return False
+								else:  # if redConns > 5.0
+									return True
+						else:  # if diff > 17894.0
 							return False
-				else:  # if greenConns > 5.0
+					else:  # if OpenConnectors > 5.5
+						return True
+				else:  # if yValue > 365.5
 					return True
-
-
-
-
+	else:  # if diff > 22001.0
+		if blueConns <= 10.0:
+			if diff <= 23471.5:
+				if yValue <= 365.5:
+					return False
+				else:  # if yValue > 365.5
+					return True
+			else:  # if diff > 23471.5
+				return False
+		else:  # if blueConns > 10.0
+			return True
 
 # This function verifies that the blocks on the board match the blockList. Returns either True or False, with True being a match
 # No parameters, No modifications
