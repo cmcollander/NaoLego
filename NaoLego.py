@@ -431,25 +431,22 @@ def tree(blueConns, greenConns, redConns, darkBlueConns, OpenConnectors, Layers,
 			else:  # if yValue > 364.5
 				return True
 	else:  # if diff > 19159.0
-		if diff <= 23542.5:
-			if yValue <= 402.0:
-				if OpenConnectors <= 6.5:
-					if yValue <= 275.0:
-						return False
-					else:  # if yValue > 275.0
-						return False
-				else:  # if OpenConnectors > 6.5
-					if diff <= 21953.5:
+		if diff <= 27434.5:
+			if yValue <= 398.5:
+				return False
+			else:  # if yValue > 398.5
+				if diff <= 22891.5:
+					return True
+				else:  # if diff > 22891.5
+					if OpenConnectors <= 7.5:
+						if yValue <= 413.0:
+							return True
+						else:  # if yValue > 413.0
+							return False
+					else:  # if OpenConnectors > 7.5
 						return True
-					else:  # if diff > 21953.5
-						return False
-			else:  # if yValue > 402.0
-				return True
-		else:  # if diff > 23542.5
+		else:  # if diff > 27434.5
 			return False
-
-
-
 
 # This function verifies that the blocks on the board match the blockList. Returns either True or False, with True being a match
 # No parameters, No modifications
