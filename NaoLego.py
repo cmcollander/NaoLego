@@ -19,12 +19,12 @@ import thread
 import time
 
 # Function defines/constants
-NOSAY = True # If true, the NAO will not speak when not necessary. Makes for easier debugging
+NOSAY = False # If true, the NAO will not speak when not necessary. Makes for easier debugging
 SERVERPORT = 8080 # What port number with the hosted webserver be run on?
 NAOPORT = 9559 # What port number does the Nao's NAOQI software run on?
 IP = "127.0.0.1" # IP Address of the Nao. Since this is run from the Nao, this is localhost
 HEADANGLE = 0.28 # Calibrated so he does not see his feet
-RECORDTRAINING = True # Should we record training data?
+RECORDTRAINING = False # Should we record training data?
 
 # Colors of blocks, represented as closely as possible to improve CV recognition through an accurate model
 DARKBLUE = (65,25,20)
@@ -134,6 +134,7 @@ def classify(diff, yValue):
 		csvwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 		csvwriter.writerow([blueConns,greenConns,redConns,darkBlueConns,OpenConnectors,Layers,yValue,diff,2])
 	# Use our generated tree to obtain a value
+	print "DATA: " + str([blueConns,greenConns,redConns,darkBlueConns,OpenConnectors,Layers,yValue,diff])
 	return tree(blueConns,greenConns,redConns,darkBlueConns,OpenConnectors,Layers,yValue,diff)
 
 # Initializes the camera settings
