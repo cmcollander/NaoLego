@@ -133,9 +133,11 @@ def classify(diff, yValue):
 	with open('data.csv', 'a') as csvfile:
 		csvwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 		csvwriter.writerow([blueConns,greenConns,redConns,darkBlueConns,OpenConnectors,Layers,yValue,diff,2)
-	return correct
-	######################## PLACE CLASSIFIER CODE HERE ############################
-	return True
+	# Use our generated tree to obtain a value
+	val = tree(blueConns,greenConns,redConns,darkBlueConns,OpenConnectors,Layers,yValue,diff)
+	if(val[0]<1)
+		return True
+	return False
 
 # Initializes the camera settings
 def initCamera():
@@ -416,6 +418,28 @@ def getAffineTransform(pt1,pt2,pt3,pt4):
 	b = 1.0*scale*math.sin(theta)
 	M = np.float32([[a,b,((1-a)*centerx) - (b*centery)],[-b,a,(b*centerx)+((1-a)*centery)]])
 	return M
+
+# Our generated tree function
+def tree(blueConns, greenConns, redConns, darkBlueConns, OpenConnectors, Layers, yValue, diff):
+	if diff <= 19204.5:
+		if yValue <= 317.5:
+			return [[ 0.  7.]]
+		else:  # if yValue > 317.5
+			if diff <= 17608.0:
+				return [[ 0.  1.]]
+			else:  # if diff > 17608.0
+				return [[ 1.  0.]]
+	else:  # if diff > 19204.5
+		if yValue <= 407.5:
+			if diff <= 22793.5:
+				if diff <= 21115.0:
+					return [[ 2.  0.]]
+				else:  # if diff > 21115.0
+					return [[ 0.  1.]]
+			else:  # if diff > 22793.5
+				return [[ 13.   0.]]
+		else:  # if yValue > 407.5
+			return [[ 0.  1.]]
 
 
 # This function verifies that the blocks on the board match the blockList. Returns either True or False, with True being a match
