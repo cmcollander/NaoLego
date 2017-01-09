@@ -20,7 +20,10 @@ def tree_to_code(tree, feature_names):
 			print "{}else:  # if {} > {}".format(indent, name, threshold)
 			recurse(tree_.children_right[node], depth + 1)
 		else:
-			print "{}return {}".format(indent, tree_.value[node])
+			val = "False"
+			if tree_.value[node][0][0]<1:
+				val = "True"
+			print "{}return {}".format(indent, val)
 	recurse(0, 1)
 
 # Lists to hold Feature and Result values
