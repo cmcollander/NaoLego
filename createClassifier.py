@@ -31,7 +31,7 @@ x = []
 y = []
 
 with open('data.csv','rb') as csvfile:
-	reader = csv.reader(csvfile,delimiter=' ',quotechar='|')
+	reader = csv.reader(csvfile,delimiter=',',quotechar='|')
 	for row in reader:
 		if len(row)==9:
 			row = [int(float(n)) for n in row]

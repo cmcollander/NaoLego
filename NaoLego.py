@@ -107,7 +107,7 @@ def recordTraining(diff,yValue):
 	training.append(correct)
 	
 	with open('data.csv', 'a') as csvfile:
-		csvwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+		csvwriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 		csvwriter.writerow(training)
 	return correct
 
@@ -131,7 +131,7 @@ def classify(diff, yValue):
 	# Let's save our data.
 	# We can add it back to the same CSV file, just using a 2 value indicating it is not training data
 	with open('data.csv', 'a') as csvfile:
-		csvwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+		csvwriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 		csvwriter.writerow([blueConns,greenConns,redConns,darkBlueConns,OpenConnectors,Layers,yValue,diff,2])
 	# Use our generated tree to obtain a value
 	print "DATA: " + str([blueConns,greenConns,redConns,darkBlueConns,OpenConnectors,Layers,yValue,diff])
