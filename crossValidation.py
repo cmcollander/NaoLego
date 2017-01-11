@@ -48,7 +48,7 @@ with open('data.csv','rb') as csvfile:
 				x.append(row[:-1])
 				y.append(row[-1])
 
-parameters = {'splitter':['best','random'],'min_samples_leaf':range(1,21),'criterion':['gini','entropy'],'max_depth':range(3,20)}
+# parameters = {'splitter':['best','random'],'min_samples_leaf':range(1,21),'criterion':['gini','entropy'],'max_depth':range(3,20)}
 # specify parameters and distributions to sample from
 param_dist = {
 	"min_samples_leaf": range(1, 51),
