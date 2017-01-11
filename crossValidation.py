@@ -1,7 +1,38 @@
 import csv
 import numpy as np
 from sklearn import tree
+from sklearn.tree import _tree
 from sklearn import grid_search
+
+output_string = ""
+
+def tree_to_code(tree, feature_names):
+	global output_string
+	output_string = ""
+	tree_ = tree.tree_
+	feature_name = [
+		feature_names[i] if i != _tree.TREE_UNDEFINED else "undefined!"
+		for i in tree_.feature
+	]
+	output_string += "def tree({}):\n".format(", ".join(feature_names))
+
+	def recurse(node, depth):
+		global output_string
+		indent = "\t" * depth
+		if tree_.feature[node] != _tree.TREE_UNDEFINED:
+			name = feature_name[node]
+			threshold = tree_.threshold[node]
+			output_string+= "{}if {} <= {}:\n".format(indent, name, threshold)
+			recurse(tree_.children_left[node], depth + 1)
+			output_string+= "{}else:  # if {} > {}\n".format(indent, name, threshold)
+			recurse(tree_.children_right[node], depth + 1)
+		else:
+			val = "False"
+			if tree_.value[node][0][0]<tree_.value[node][0][1]:
+				val = "True"
+			output_string+= "{}return {}\n".format(indent, val)
+	recurse(0, 1)
+	return output_string
 
 features = ["Conns","OpenConnectors","Layers","yValue","diff"]
 
@@ -27,3 +58,6 @@ clf = grid_search.GridSearchCV(tree.DecisionTreeClassifier(),param_dist,n_jobs =
 clf.fit(x,y)
 tree_model = clf.best_estimator_
 print (clf.best_score_,clf.best_params_)
+st = tree_to_code(tree_model,features)
+with open('classifier.py','w') as f:
+	f.write(st)
