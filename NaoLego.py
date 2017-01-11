@@ -421,10 +421,7 @@ def getAffineTransform(pt1,pt2,pt3,pt4):
 def tree(blueConns, greenConns, redConns, darkBlueConns, OpenConnectors, Layers, yValue, diff):
 	if diff <= 19159.0:
 		if diff <= 16583.0:
-			if diff <= 13364.0:
-				return True
-			else:  # if diff > 13364.0
-				return True
+			return True
 		else:  # if diff > 16583.0
 			if yValue <= 364.5:
 				if OpenConnectors <= 4.5:
@@ -437,32 +434,19 @@ def tree(blueConns, greenConns, redConns, darkBlueConns, OpenConnectors, Layers,
 		if diff <= 27434.5:
 			if yValue <= 398.5:
 				if Layers <= 3.5:
-					if diff <= 20281.5:
-						return False
-					else:  # if diff > 20281.5
-						if yValue <= 314.5:
-							return False
-						else:  # if yValue > 314.5
-							if yValue <= 369.0:
-								return False
-							else:  # if yValue > 369.0
-								return False
+					return False
 				else:  # if Layers > 3.5
-					return False
+					if diff <= 22061.0:
+						return True
+					else:  # if diff > 22061.0
+						return False
 			else:  # if yValue > 398.5
-				if Layers <= 2.5:
-					return False
-				else:  # if Layers > 2.5
+				if diff <= 22891.5:
+					return True
+				else:  # if diff > 22891.5
 					return True
 		else:  # if diff > 27434.5
-			if OpenConnectors <= 5.5:
-				return False
-			else:  # if OpenConnectors > 5.5
-				if OpenConnectors <= 7.5:
-					return False
-				else:  # if OpenConnectors > 7.5
-					return False
-
+			return False
 
 
 # This function verifies that the blocks on the board match the blockList. Returns either True or False, with True being a match
