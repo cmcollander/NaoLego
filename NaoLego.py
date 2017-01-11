@@ -4,7 +4,7 @@ from HeadTouch import HeadTouch
 from LegoBlock import LegoBlock
 from naoqi import ALProxy
 from naoqi import ALBroker
-import classifier
+from classifier import tree
 
 import csv
 import cv2
