@@ -29,7 +29,7 @@ def tree_to_code(tree, feature_names):
 			recurse(tree_.children_right[node], depth + 1)
 		else:
 			val = "False"
-			if tree_.value[node][0][0]<tree_.value[node][0][1]:
+			if (3*tree_.value[node][0][1])>=(2*tree_.value[node][0][0]):
 				val = "True"
 			output_string+= "{}return {}\n".format(indent, val)
 	recurse(0, 1)
