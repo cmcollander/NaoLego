@@ -61,3 +61,6 @@ print (clf.best_score_,clf.best_params_)
 st = tree_to_code(tree_model,features)
 with open('classifier.py','w') as f:
 	f.write(st)
+
+with open("NaoDecisionTree.dot",'w') as f:
+	f = tree.export_graphviz(tree_model,out_file=f)
