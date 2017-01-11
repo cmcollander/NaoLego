@@ -3,19 +3,24 @@
   <!-- <meta http-equiv="refresh" content="1"> -->
 </head>
 <body>
-<img id="image" style="width:320px;height:240px;"/>
+<img id="image" style="width:6400px;height:480px;"/>
 <br />
-<img src="diff.jpg" style="width:160px;height:120px;"/>
-<img src="corners.jpg" style="width:160px;height:120px;"/>
-<img src="perspective.jpg" style="width:160px;height:120px;" />
-<img src="frameP.jpg" style="width:160px;height:120px;" />
+<img id="diff" style="width:160px;height:120px;"/>
+<img id="corners" style="width:160px;height:120px;"/>
+<img id="perspective" style="width:160px;height:120px;" />
+<img id="frameP" style="width:160px;height:120px;" />
 
 <script type="text/javascript">
 	
 	setInterval(function() {
 
-		document.getElementById('image').src = "image.jpg";
-
+		var timestamp = new Date().getTime();
+		
+		document.getElementById('image').src = "image.jpg?";
+		document.getElementById('corners').src= "corners.jpg?" + timestamp;
+		document.getElementById('perspective').src = "perspective.jpg?" + timestamp;
+		document.getElementById('frameP').src = "frameP.jpg?" + timestamp;
+		document.getElementById('diff').src = "diff.jpg?" + timestamp;
 
 	}, 1000);
 
