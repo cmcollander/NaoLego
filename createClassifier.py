@@ -33,7 +33,7 @@ y = []
 with open('data.csv','rb') as csvfile:
 	reader = csv.reader(csvfile,delimiter=',',quotechar='|')
 	for row in reader:
-		if len(row)==9:
+		if len(row)==6:
 			row = [int(float(n)) for n in row]
 			if row[-1]==0 or row[-1]==1: # We only want final values of 0 or 1 as they are the training data
 				x.append(row[:-1])
@@ -42,7 +42,7 @@ with open('data.csv','rb') as csvfile:
 clf = tree.DecisionTreeClassifier(min_samples_leaf = 4, criterion="gini")
 clf = clf.fit(x,y)
 
-tree_to_code(clf,["blueConns","greenConns","redConns","darkBlueConns","OpenConnectors","Layers","yValue","diff"])
+tree_to_code(clf,["Conns","OpenConnectors","Layers","yValue","diff"])
 
 with open("NaoDecisionTree.dot",'w') as f:
 	f = tree.export_graphviz(clf,out_file=f)

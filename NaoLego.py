@@ -28,7 +28,6 @@ HEADANGLE = 0.28 # Calibrated so he does not see his feet
 RECORDTRAINING = False # Should we record training data?
 
 # Colors of blocks, represented as closely as possible to improve CV recognition through an accurate model
-DARKBLUE = (65,25,20)
 BLUE = (147,60,15)
 GREEN = (30,120,23)
 RED = (18,16,180)
@@ -59,7 +58,6 @@ red2x1b = LegoBlock(2,1,RED,0,0)
 green2x1a = LegoBlock(2,1,GREEN,0,0)
 green2x1b = LegoBlock(2,1,GREEN,0,0)
 green2x1c = LegoBlock(2,1,GREEN,0,0)
-blue2x1 = LegoBlock(2,1,DARKBLUE,0,0)
 presentBlockList.append(red4x1)
 presentBlockList.append(green4x1)
 presentBlockList.append(blue4x1a)
@@ -71,7 +69,6 @@ presentBlockList.append(red2x1b)
 presentBlockList.append(green2x1a)
 presentBlockList.append(green2x1b)
 presentBlockList.append(green2x1c)
-#presentBlockList.append(blue2x1) # DO NOT USE DARK BLUE 2x1 BLOCK
 random.shuffle(presentBlockList) # Shuffle our presentBlockList
 
 blockList = [] # Represents a list of LegoBlocks that are in our assembly. Is initialized as empty
@@ -82,8 +79,6 @@ def recordTraining(diff,yValue):
 	blueConns = 0
 	greenConns = 0
 	redConns = 0
-	darkBlueConns = 0
-	
 	for block in blockList:
 		if block.getColor()==BLUE:
 			blueConns = blueConns + block.getWidth()
@@ -91,16 +86,10 @@ def recordTraining(diff,yValue):
 			greenConns = greenConns + block.getWidth()
 		if block.getColor()==RED:
 			redConns = redConns + block.getWidth()
-		if block.getColor()==DARKBLUE:
-			darkBlueConns = darkBlueConns + block.getWidth()
-	
 	OpenConnectors = getOpenConnectorCount()
 	Layers = len(blockList)
 	correct = input("Correct? (0 or 1) :")
-	training.append(blueConns)
-	training.append(greenConns)
-	training.append(redConns)
-	training.append(darkBlueConns)
+	training.append(blueConns+greenConns+redConns)
 	training.append(OpenConnectors)
 	training.append(Layers)
 	training.append(yValue)
@@ -116,7 +105,6 @@ def classify(diff, yValue):
 	blueConns = 0
 	greenConns = 0
 	redConns = 0
-	darkBlueConns = 0
 	for block in blockList:
 		if block.getColor()==BLUE:
 			blueConns = blueConns + block.getWidth()
@@ -124,8 +112,6 @@ def classify(diff, yValue):
 			greenConns = greenConns + block.getWidth()
 		if block.getColor()==RED:
 			redConns = redConns + block.getWidth()
-		if block.getColor()==DARKBLUE:
-			darkBlueConns = darkBlueConns + block.getWidth()
 	OpenConnectors = getOpenConnectorCount()
 	Layers = len(blockList)
 	
@@ -133,10 +119,10 @@ def classify(diff, yValue):
 	# We can add it back to the same CSV file, just using a 2 value indicating it is not training data
 	with open('data.csv', 'a') as csvfile:
 		csvwriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-		csvwriter.writerow([blueConns,greenConns,redConns,darkBlueConns,OpenConnectors,Layers,yValue,diff,2])
+		csvwriter.writerow([blueConns+greenConns+redConns,OpenConnectors,Layers,yValue,diff,2])
 	# Use our generated tree to obtain a value
-	print "DATA: " + str([blueConns,greenConns,redConns,darkBlueConns,OpenConnectors,Layers,yValue,diff])
-	return tree(blueConns,greenConns,redConns,darkBlueConns,OpenConnectors,Layers,yValue,diff)
+	print "DATA: " + str([blueConns+greenConns+redConns,OpenConnectors,Layers,yValue,diff])
+	return tree(blueConns+greenConns+redConns,OpenConnectors,Layers,yValue,diff)
 
 # Initializes the camera settings
 def initCamera():
