@@ -3,7 +3,7 @@
   <!-- <meta http-equiv="refresh" content="1"> -->
 </head>
 <body>
-<img id="image" style="width:6400px;height:480px;"/>
+<img id="image" style="width:640px;height:480px;"/>
 <br />
 <img id="diff" style="width:160px;height:120px;"/>
 <img id="corners" style="width:160px;height:120px;"/>
@@ -16,7 +16,7 @@
 
 		var timestamp = new Date().getTime();
 		
-		document.getElementById('image').src = "image.jpg?";
+		document.getElementById('image').src = "image.jpg?" + timestamp;
 		document.getElementById('corners').src= "corners.jpg?" + timestamp;
 		document.getElementById('perspective').src = "perspective.jpg?" + timestamp;
 		document.getElementById('frameP').src = "frameP.jpg?" + timestamp;
