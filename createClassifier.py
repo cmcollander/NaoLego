@@ -39,7 +39,7 @@ with open('data.csv','rb') as csvfile:
 				x.append(row[:-1])
 				y.append(row[-1])
 
-clf = tree.DecisionTreeClassifier(min_samples_leaf = 5, criterion="entropy", max_leaf_nodes=10)
+clf = tree.DecisionTreeClassifier(min_samples_leaf = 4, criterion="gini")
 clf = clf.fit(x,y)
 
 tree_to_code(clf,["blueConns","greenConns","redConns","darkBlueConns","OpenConnectors","Layers","yValue","diff"])
