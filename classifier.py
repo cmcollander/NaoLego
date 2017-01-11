@@ -2,15 +2,9 @@ def tree(Conns, OpenConnectors, Layers, yValue, diff):
 	if diff <= 20575.0:
 		if yValue <= 189.0:
 			if diff <= 16402.5:
-				if yValue <= 168.0:
-					return True
-				else:  # if yValue > 168.0
-					return True
+				return True
 			else:  # if diff > 16402.5
-				if yValue <= 172.0:
-					return False
-				else:  # if yValue > 172.0
-					return False
+				return False
 		else:  # if yValue > 189.0
 			if diff <= 17396.0:
 				return True
@@ -29,31 +23,28 @@ def tree(Conns, OpenConnectors, Layers, yValue, diff):
 					else:  # if yValue > 364.5
 						return True
 	else:  # if diff > 20575.0
-		if diff <= 25469.5:
-			if yValue <= 403.0:
-				if Layers <= 3.5:
-					if diff <= 22524.5:
-						return False
-					else:  # if diff > 22524.5
-						if yValue <= 369.0:
-							return False
-						else:  # if yValue > 369.0
-							return False
-				else:  # if Layers > 3.5
-					if diff <= 22078.5:
-						return True
-					else:  # if diff > 22078.5
-						if OpenConnectors <= 8.5:
-							return False
-						else:  # if OpenConnectors > 8.5
-							return True
-			else:  # if yValue > 403.0
-				if Layers <= 2.5:
+		if diff <= 25687.5:
+			if OpenConnectors <= 4.5:
+				if yValue <= 314.5:
+					return False
+				else:  # if yValue > 314.5
 					if yValue <= 418.5:
-						return True
+						if yValue <= 364.5:
+							return False
+						else:  # if yValue > 364.5
+							return False
 					else:  # if yValue > 418.5
 						return False
-				else:  # if Layers > 2.5
+			else:  # if OpenConnectors > 4.5
+				if yValue <= 386.0:
+					if Conns <= 11.0:
+						return False
+					else:  # if Conns > 11.0
+						if diff <= 22078.5:
+							return True
+						else:  # if diff > 22078.5
+							return False
+				else:  # if yValue > 386.0
 					if diff <= 23328.0:
 						return True
 					else:  # if diff > 23328.0
@@ -61,26 +52,23 @@ def tree(Conns, OpenConnectors, Layers, yValue, diff):
 							return True
 						else:  # if Conns > 13.0
 							return True
-		else:  # if diff > 25469.5
-			if Layers <= 4.5:
-				if yValue <= 349.5:
-					return False
-				else:  # if yValue > 349.5
-					if yValue <= 410.5:
-						if diff <= 27391.5:
-							return True
-						else:  # if diff > 27391.5
+		else:  # if diff > 25687.5
+			if OpenConnectors <= 9.5:
+				if diff <= 27434.5:
+					if diff <= 27009.5:
+						if diff <= 26444.0:
 							return False
-					else:  # if yValue > 410.5
-						if OpenConnectors <= 7.5:
+						else:  # if diff > 26444.0
 							return False
-						else:  # if OpenConnectors > 7.5
-							return False
-			else:  # if Layers > 4.5
-				if yValue <= 418.5:
-					if yValue <= 317.0:
+					else:  # if diff > 27009.5
 						return False
-					else:  # if yValue > 317.0
+				else:  # if diff > 27434.5
+					if diff <= 30243.0:
 						return False
-				else:  # if yValue > 418.5
-					return True
+					else:  # if diff > 30243.0
+						if diff <= 31518.5:
+							return False
+						else:  # if diff > 31518.5
+							return False
+			else:  # if OpenConnectors > 9.5
+				return False
