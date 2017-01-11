@@ -2,9 +2,9 @@ def tree(Conns, OpenConnectors, Layers, yValue, diff):
 	if diff <= 20575.0:
 		if yValue <= 189.0:
 			if diff <= 16402.5:
-				if Layers <= 1.5:
+				if diff <= 13613.5:
 					return True
-				else:  # if Layers > 1.5
+				else:  # if diff > 13613.5
 					return True
 			else:  # if diff > 16402.5
 				if diff <= 18932.0:
@@ -20,10 +20,7 @@ def tree(Conns, OpenConnectors, Layers, yValue, diff):
 						if yValue <= 277.5:
 							return False
 						else:  # if yValue > 277.5
-							if yValue <= 326.5:
-								return False
-							else:  # if yValue > 326.5
-								return False
+							return False
 					else:  # if OpenConnectors > 4.5
 						return True
 				else:  # if yValue > 345.5
@@ -39,16 +36,7 @@ def tree(Conns, OpenConnectors, Layers, yValue, diff):
 						return False
 					else:  # if diff > 22524.5
 						if yValue <= 369.0:
-							if yValue <= 309.0:
-								return False
-							else:  # if yValue > 309.0
-								if yValue <= 358.5:
-									if yValue <= 334.0:
-										return False
-									else:  # if yValue > 334.0
-										return False
-								else:  # if yValue > 358.5
-									return True
+							return False
 						else:  # if yValue > 369.0
 							return False
 				else:  # if Layers > 3.5
@@ -70,10 +58,7 @@ def tree(Conns, OpenConnectors, Layers, yValue, diff):
 						return True
 					else:  # if diff > 23328.0
 						if Conns <= 13.0:
-							if yValue <= 415.5:
-								return True
-							else:  # if yValue > 415.5
-								return False
+							return True
 						else:  # if Conns > 13.0
 							return True
 		else:  # if diff > 25469.5
@@ -85,13 +70,7 @@ def tree(Conns, OpenConnectors, Layers, yValue, diff):
 						if diff <= 27391.5:
 							return True
 						else:  # if diff > 27391.5
-							if yValue <= 391.0:
-								if diff <= 30465.5:
-									return False
-								else:  # if diff > 30465.5
-									return False
-							else:  # if yValue > 391.0
-								return False
+							return False
 					else:  # if yValue > 410.5
 						if OpenConnectors <= 7.5:
 							return False

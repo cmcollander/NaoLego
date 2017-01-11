@@ -20,7 +20,9 @@ parameters = {'splitter':['best','random'],'min_samples_leaf':range(1,21),'crite
 # specify parameters and distributions to sample from
 param_dist = {
 	"min_samples_leaf": range(1, 51),
-	"criterion": ["gini", "entropy"]}
+	"criterion": ["gini", "entropy"],
+	"max_depth": range(1,10)
+}
 clf = grid_search.GridSearchCV(tree.DecisionTreeClassifier(),param_dist,n_jobs = 8)
 clf.fit(x,y)
 tree_model = clf.best_estimator_
