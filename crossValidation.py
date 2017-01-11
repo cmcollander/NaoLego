@@ -3,6 +3,7 @@ import numpy as np
 from sklearn import tree
 from sklearn.tree import _tree
 from sklearn import grid_search
+import os
 
 output_string = ""
 
@@ -64,3 +65,5 @@ with open('classifier.py','w') as f:
 
 with open("NaoDecisionTree.dot",'w') as f:
 	f = tree.export_graphviz(tree_model,out_file=f)
+
+os.system("dot -Tps NaoDecisionTree.dot -o out.pdf")
