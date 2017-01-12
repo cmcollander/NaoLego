@@ -47,6 +47,8 @@ HeadTouch = HeadTouch("HeadTouch") # Reacts to a head touch
 
 # What lego blocks do we have?
 presentBlockList = [] # Represents the list of LegoBlocks we actually have
+blockList = [] # Represents a list of LegoBlocks that are in our assembly. Is initialized as empty
+
 red4x1 = LegoBlock(4,1,RED,0,0)
 green4x1 = LegoBlock(4,1,GREEN,0,0)
 blue4x1a = LegoBlock(4,1,BLUE,0,0)
@@ -58,20 +60,26 @@ red2x1b = LegoBlock(2,1,RED,0,0)
 green2x1a = LegoBlock(2,1,GREEN,0,0)
 green2x1b = LegoBlock(2,1,GREEN,0,0)
 green2x1c = LegoBlock(2,1,GREEN,0,0)
-presentBlockList.append(red4x1)
-presentBlockList.append(green4x1)
-presentBlockList.append(blue4x1a)
-presentBlockList.append(blue4x1b)
-presentBlockList.append(blue4x1c)
-presentBlockList.append(blue4x1d)
-presentBlockList.append(red2x1a)
-presentBlockList.append(red2x1b)
-presentBlockList.append(green2x1a)
-presentBlockList.append(green2x1b)
-presentBlockList.append(green2x1c)
-random.shuffle(presentBlockList) # Shuffle our presentBlockList
 
-blockList = [] # Represents a list of LegoBlocks that are in our assembly. Is initialized as empty
+def resetBlockLists():
+	global presentBlockList
+	global blockList
+	blockList = []
+	presentBlockList = []
+	presentBlockList.append(red4x1)
+	presentBlockList.append(green4x1)
+	presentBlockList.append(blue4x1a)
+	presentBlockList.append(blue4x1b)
+	presentBlockList.append(blue4x1c)
+	presentBlockList.append(blue4x1d)
+	presentBlockList.append(red2x1a)
+	presentBlockList.append(red2x1b)
+	presentBlockList.append(green2x1a)
+	presentBlockList.append(green2x1b)
+	presentBlockList.append(green2x1c)
+	random.shuffle(presentBlockList) # Shuffle our presentBlockList
+	for block in presentBlockList:
+		block.setCoords(0,0) # Make sure all our blocks are listed as (0,0) positions to start
 
 def recordTraining(diff,yValue):
 	# BlueConns,GreenConns,RedConns,DarkBlueConns,OpenConnectors,Layers,yValue,diff : Correct/Incorrect (1/0)
@@ -136,7 +144,7 @@ def playAudio(file):
 	audio.play(fileID)
 
 # Define a custom webserver so no printing to stdout (leave for our own debugging messages)
-class TestServer(SocketServer.TCPServer):
+class MinimalTextServer(SocketServer.TCPServer):
 	allow_reuse_address = True 
 	logging = False
 class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
@@ -147,7 +155,7 @@ class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 # Starts a webserver to display index.html. Is run in a separate thread
 def webServerThread():
 	Handler = MyHandler
-	httpd = TestServer(("",SERVERPORT),Handler)
+	httpd = MinimalTextServer(("",SERVERPORT),Handler)
 	while not Finished:
 		httpd.handle_request()
 	httpd.shutdown()
@@ -486,6 +494,12 @@ def verifyBlocks():
 	# Perform the actual analysis of our values using the decision tree classifier, and save our info as obtained data
 	return classify(int(n),pt3[1])
 
+def removeImageAfterDelay():
+	time.sleep(3) # 3 Second Delay
+	img = np.zeros((480, 640, 3), dtype=np.uint8)
+	img.fill(255)
+	cv2.imwrite("image.jpg",img)
+
 # -------------- MAIN -------------------------
 
 # First thing, start our webserver
@@ -498,7 +512,7 @@ initCamera()
 # Get the NAO in the correct position
 posture.goToPosture("StandInit",1.0)
 
-NaoSay("Hello! Thank you for playing my Lego Assembly game. First, please ensure that the board in front of me is clear and you have logged into my webserver. My server address is 192.168.1.12 port 8 0 8 0.")
+NaoSay("Hello! Thank you for playing my Lego Memory game. First, please ensure that the board in front of me is clear and you have logged into my webserver. My server address is 192.168.1.12 port 8 0 8 0.")
 waitForHeadTouch()
 NaoSay("Give me one moment to analyze the board.")
 
@@ -507,25 +521,34 @@ motion.setAngles("HeadPitch",HEADANGLE,0.1)
 time.sleep(1) # Allow time for our head to reach the correct location before obtaining points
 initPerspective() # Find our perspective transformation
 
-NaoSay("Great! We will be assembling a group of legos step by step. When prompted, please recreate the assembly I will show you and place it on the board, as straight as possible, with the connectors facing me.")
+NaoSay("Great! I will show you a configuration of lego blocks for a short period. You will then recreate the assembly I showed you to the best of your ability. When prompted, please recreate the assembly and place it on the board, as straight as possible, with the connectors facing me.")
 
 # First block
-addBlock()
-NaoSay("Lets start by adding a single block")
+NaoSay("Lets start with just a single block")
+resetBlockLists()
+addBlock() # Single block for now
 sendBlockList()
+removeImageAfterDelay()
+
 waitForHeadTouchAfterBlockPlaced()
 while not verifyBlocks():
-	NaoSay("I'm sorry, that doesn't look right. Please place the block shown in the image.")
+	NaoSay("I'm sorry, that doesn't look right. Let me show it to you again.")
+	sendBlockList()
+	removeImageAfterDelay()
 	waitForHeadTouchAfterBlockPlaced()
 
-# Ready for additional blocks
-for lcv in range(4): # Place 4 additional blocks, for a total of 5 layers
-	addBlock()
+for lcv in range(4):
+	NaoSay("Good Job. Now, lets try another random configuration with an extra block.")
+	resetBlockLists()
+	for i in range(2,lcv+3):
+		addBlock() # Add an extra block for every iteration
 	sendBlockList()
-	NaoSay("Good Job. Now, please add this new block to the assembly.")
+	removeImageAfterDelay()
 	waitForHeadTouchAfterBlockPlaced()
 	while not verifyBlocks():
-		NaoSay("I'm sorry, that doesn't look right. Please place the assembly shown in the image.")
+		NaoSay("I'm sorry, that doesn't look right. Let me show it to you again.")
+		sendBlockList()
+		removeImageAfterDelay()
 		waitForHeadTouchAfterBlockPlaced()
 
 sendFinScreen()
