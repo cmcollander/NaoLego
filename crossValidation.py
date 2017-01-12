@@ -2,7 +2,7 @@ import csv
 import numpy as np
 from sklearn import tree
 from sklearn.tree import _tree
-from sklearn import grid_search
+from sklearn import model_selection
 import os
 
 output_string = ""
@@ -55,7 +55,7 @@ param_dist = {
 	"criterion": ["gini", "entropy"],
 	"max_depth": range(1,10)
 }
-clf = grid_search.GridSearchCV(tree.DecisionTreeClassifier(),param_dist,n_jobs = 8)
+clf = model_selection.GridSearchCV(tree.DecisionTreeClassifier(),param_dist,n_jobs = 8)
 clf.fit(x,y)
 tree_model = clf.best_estimator_
 print (clf.best_score_,clf.best_params_)
