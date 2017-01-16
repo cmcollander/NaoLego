@@ -527,6 +527,7 @@ while not verifyBlocks():
 for lcv in range(4):
 	NaoSay("Good Job. Now, lets try another random configuration with an extra block.")
 	resetBlockLists()
+	addBlock()
 	for i in range(2,lcv+3):
 		addBlock() # Add an extra block for every iteration
 	sendBlockList()
