@@ -49,37 +49,23 @@ HeadTouch = HeadTouch("HeadTouch") # Reacts to a head touch
 presentBlockList = [] # Represents the list of LegoBlocks we actually have
 blockList = [] # Represents a list of LegoBlocks that are in our assembly. Is initialized as empty
 
-red4x1 = LegoBlock(4,1,RED,0,0)
-green4x1 = LegoBlock(4,1,GREEN,0,0)
-blue4x1a = LegoBlock(4,1,BLUE,0,0)
-blue4x1b = LegoBlock(4,1,BLUE,0,0)
-blue4x1c = LegoBlock(4,1,BLUE,0,0)
-blue4x1d = LegoBlock(4,1,BLUE,0,0)
-red2x1a = LegoBlock(2,1,RED,0,0)
-red2x1b = LegoBlock(2,1,RED,0,0)
-green2x1a = LegoBlock(2,1,GREEN,0,0)
-green2x1b = LegoBlock(2,1,GREEN,0,0)
-green2x1c = LegoBlock(2,1,GREEN,0,0)
-
 def resetBlockLists():
 	global presentBlockList
 	global blockList
 	blockList = []
 	presentBlockList = []
-	presentBlockList.append(red4x1)
-	presentBlockList.append(green4x1)
-	presentBlockList.append(blue4x1a)
-	presentBlockList.append(blue4x1b)
-	presentBlockList.append(blue4x1c)
-	presentBlockList.append(blue4x1d)
-	presentBlockList.append(red2x1a)
-	presentBlockList.append(red2x1b)
-	presentBlockList.append(green2x1a)
-	presentBlockList.append(green2x1b)
-	presentBlockList.append(green2x1c)
+	presentBlockList.append(LegoBlock(4,1,RED,0,0))
+	presentBlockList.append(LegoBlock(4,1,GREEN,0,0))
+	presentBlockList.append(LegoBlock(4,1,BLUE,0,0))
+	presentBlockList.append(LegoBlock(4,1,BLUE,0,0))
+	presentBlockList.append(LegoBlock(4,1,BLUE,0,0))
+	presentBlockList.append(LegoBlock(4,1,BLUE,0,0))
+	presentBlockList.append(LegoBlock(2,1,RED,0,0))
+	presentBlockList.append(LegoBlock(2,1,RED,0,0))
+	presentBlockList.append(LegoBlock(2,1,GREEN,0,0))
+	presentBlockList.append(LegoBlock(2,1,GREEN,0,0))
+	presentBlockList.append(LegoBlock(2,1,GREEN,0,0))
 	random.shuffle(presentBlockList) # Shuffle our presentBlockList
-	for block in presentBlockList:
-		block.setCoords(0,0) # Make sure all our blocks are listed as (0,0) positions to start
 
 def recordTraining(diff,yValue):
 	# BlueConns,GreenConns,RedConns,DarkBlueConns,OpenConnectors,Layers,yValue,diff : Correct/Incorrect (1/0)
