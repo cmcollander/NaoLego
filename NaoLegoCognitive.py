@@ -296,6 +296,7 @@ def sendFinScreen():
 # Tells the NAO to say a message. Takes the message as a string parameters. No returns or modifications
 # Moves his head to look at the user while talking
 def NaoSay(s):
+	motion.setAngles(["LShoulderPitch","RShoulderPitch"],[2,2],0.2)
 	if NOSAY:
 		return
 	motion.setAngles("HeadPitch",0,0.1) # Look at the user
