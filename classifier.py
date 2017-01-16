@@ -2,18 +2,15 @@ def tree(Conns, OpenConnectors, Layers, yValue, diff):
 	if diff <= 20577.0:
 		if yValue <= 189.0:
 			if diff <= 16402.5:
-				if diff <= 13043.5:
+				if diff <= 13310.5:
 					return True
-				else:  # if diff > 13043.5
+				else:  # if diff > 13310.5
 					return True
 			else:  # if diff > 16402.5
 				if diff <= 19010.0:
 					return False
 				else:  # if diff > 19010.0
-					if yValue <= 170.5:
-						return False
-					else:  # if yValue > 170.5
-						return False
+					return False
 		else:  # if yValue > 189.0
 			if diff <= 17396.0:
 				return True
@@ -30,21 +27,24 @@ def tree(Conns, OpenConnectors, Layers, yValue, diff):
 						return True
 	else:  # if diff > 20577.0
 		if OpenConnectors <= 4.5:
-			if yValue <= 330.5:
-				if yValue <= 145.5:
-					return False
-				else:  # if yValue > 145.5
-					if yValue <= 314.5:
+			if yValue <= 364.5:
+				if yValue <= 306.5:
+					if yValue <= 167.0:
 						return False
-					else:  # if yValue > 314.5
+					else:  # if yValue > 167.0
 						return False
-			else:  # if yValue > 330.5
-				if diff <= 23429.0:
-					if yValue <= 364.0:
+				else:  # if yValue > 306.5
+					if yValue <= 340.0:
 						return False
-					else:  # if yValue > 364.0
+					else:  # if yValue > 340.0
+						return False
+			else:  # if yValue > 364.5
+				if diff <= 23127.0:
+					if yValue <= 398.5:
 						return True
-				else:  # if diff > 23429.0
+					else:  # if yValue > 398.5
+						return True
+				else:  # if diff > 23127.0
 					if diff <= 29046.0:
 						return False
 					else:  # if diff > 29046.0
