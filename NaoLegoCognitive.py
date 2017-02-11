@@ -36,7 +36,7 @@ RED = (18,16,180)
 Finished = False # Represents if our program has finished running, used to stop the web server
 perspective_mat = None # Holds the transformation matrix for the visual perspective
 
-# NAO Modules 
+# NAO Modules
 tts = ALProxy("ALTextToSpeech",IP,NAOPORT) # Handles speech from the Nao
 motion = ALProxy("ALMotion",IP,NAOPORT) # Handles joint movements for the Nao
 posture = ALProxy("ALRobotPosture",IP,NAOPORT) # Handles postures of the robot
@@ -89,7 +89,7 @@ def recordTraining(diff,yValue):
 	training.append(yValue)
 	training.append(diff)
 	training.append(correct)
-	
+
 	with open('data.csv', 'a') as csvfile:
 		csvwriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 		csvwriter.writerow(training)
@@ -108,7 +108,7 @@ def classify(diff, yValue):
 			redConns = redConns + block.getWidth()
 	OpenConnectors = getOpenConnectorCount()
 	Layers = len(blockList)
-	
+
 	# Let's save our data.
 	# We can add it back to the same CSV file, just using a 2 value indicating it is not training data
 	with open('data.csv', 'a') as csvfile:
@@ -131,13 +131,13 @@ def playAudio(file):
 
 # Define a custom webserver so no printing to stdout (leave for our own debugging messages)
 class MinimalTextServer(SocketServer.TCPServer):
-	allow_reuse_address = True 
+	allow_reuse_address = True
 	logging = False
 class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 	def log_message(self, format, *args):
 		if self.server.logging:
 			SimpleHTTPServer.SimpleHTTPRequestHandler.log_message(self, format, *args)
-	
+
 # Starts a webserver to display index.html. Is run in a separate thread
 def webServerThread():
 	Handler = MyHandler
@@ -311,7 +311,7 @@ def waitForHeadTouchAfterBlockPlaced():
 	while not HeadTouch.isTouched():
 		time.sleep(0.25)
 	playAudio("/home/nao/NaoLego/resources/ack.wav") # Play an audio file to acknowledge the head touch
-	
+
 # The nao will prompt the user and wait until his head receives contact
 def waitForHeadTouch():
 	global HeadTouch
@@ -360,7 +360,7 @@ def initPerspective():
 		[639, 479],
 		[0, 479]], dtype = "float32")
 	perspective_mat = cv2.getPerspectiveTransform(perspective_pts,dst)
-	
+
 	# Create an image of our initial image overlayed with our perspective points
 	p_img = img
 	p_list = perspective_pts.tolist()
@@ -378,7 +378,7 @@ def getOpenConnectorCount():
 			if b==False:
 				count = count + 1
 	return count
-			
+
 # Apply perspective correction
 def perspectiveCorrection(frame):
 	return cv2.warpPerspective(frame,perspective_mat,(640,480))
@@ -440,7 +440,7 @@ def verifyBlocks():
 			corners2.append(corner) # Only use corners that lie above the y=450 line
 			cv2.circle(img_frame,(x,y),10,255,-1)
 	corners = corners2
-	
+
 	# Sort the points by their y values
 	li = []
 	for corner in corners:
@@ -468,16 +468,16 @@ def verifyBlocks():
 	exp_img = cv2.warpAffine(exp_img,M,(rows,cols)) # Rotate and scale our image
 	exp_img = cv2.warpAffine(exp_img,N,(rows,cols)) # Translate our image
 	exp_img[np.where((exp_img==[0,0,0]).all(axis=2))] = [255,255,255] # Turn background white, rather than black
-	
+
 	# Determine the norm between the model and the camera and save this image for visualizing
 	n = cv2.norm(exp_img,img,cv2.NORM_L2)
 	d = cv2.absdiff(img,exp_img)
 	cv2.imwrite("diff.jpg",d)
-	
+
 	# If we are reading data, use the inputed value as our return, and save our information as training data
 	if RECORDTRAINING:
 		return recordTraining(int(n),pt3[1])
-	
+
 	# Perform the actual analysis of our values using the decision tree classifier, and save our info as obtained data
 	return classify(int(n),pt3[1])
 
